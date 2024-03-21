@@ -6,8 +6,8 @@ from werkzeug.security import check_password_hash
 from flask_minify import Minify
 import pandas as pd
 from datetime import date
+from utils import *
 from chat import *
-
 app = Flask(__name__,static_url_path='/static', 
             static_folder='static',
             template_folder='templates')
