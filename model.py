@@ -52,7 +52,7 @@ or to answer "what is the interest for capital of 5000 euro for rate of 3%  for 
 ```json
 {
     "tool_name": "InterestCalculator",
-    "input":"output=interest_simple(income=5000,rate=3,period=4,debit=2)"
+    "input":"output=interest_simple(capital=5000,rate=3,period=4,debit=2)"
 }
 ```
 
