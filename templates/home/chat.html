@@ -225,16 +225,21 @@ body::-webkit-scrollbar {
 }
 
 .bottom_wrapper {
-  position: relative;
-  width: 100%;
-  background-color: #fff;
-  padding: 4px 25px;;
-  position: absolute;
-  bottom: 0;
+    width: 100%;
+    display: flex;
+    background-color: #fff;
+    padding: 4px 25px;
+    position: absolute;
+    bottom: 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
 }
+
 .bottom_wrapper .message_input_wrapper {
   display: inline-block;
-  height: 30px;
+  min-height: 60px;
   border-radius: 25px;
   border: 1px solid #bcbdc0;
   width: calc(100% - 160px);
@@ -268,7 +273,7 @@ body::-webkit-scrollbar {
   background-color: #fff;
 }
 .bottom_wrapper .send_message .text {
-  font-size: 18px;
+  font-size: 12px;
   font-weight: 500;
   display: inline-block;
   line-height: 25px;
@@ -396,6 +401,34 @@ height:100%;
 }
 
 
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: black;
+    animation: jump 1.4s infinite linear;
+    margin: 0 2px;
+}
+
+@keyframes jump {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(-15px);
+    }
+}
+
+#loadingIndicator {
+    text-align: center;
+}
+
+
+
  </style>
 
 
@@ -415,7 +448,7 @@ height:100%;
     <ul class="messages"></ul>
     <div class="bottom_wrapper clearfix">
         <div class="message_input_wrapper">
-            <input class="message_input" placeholder="Type your message here..." />
+            <textarea class="message_input" placeholder="Type your message here..." /> </textarea>
         </div>
         <div class="send_message">
             <div class="icon"></div>
@@ -429,6 +462,10 @@ height:100%;
     <li class="message">
         <div class="avatar"></div>
         <div class="text_wrapper">
+            <div id="loadingIndicator" style="display: none;">
+    <span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+</div>
+
             <div class="text"></div>
         </div>
     </li>
@@ -498,6 +535,8 @@ height:100%;
 // Draw user message
     message.draw();
 
+
+$('#loadingIndicator').show();
 // Call getResponse() to get the chatbot's response
 $.get("/get", { msg: text }).done(function(data) {
     var botMessage = new Message({
@@ -509,6 +548,7 @@ $.get("/get", { msg: text }).done(function(data) {
     // Draw bot message
     botMessage.draw();
     $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+    $('#loadingIndicator').hide();
 });
 
 return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);

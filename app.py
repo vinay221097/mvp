@@ -138,7 +138,7 @@ def chat(user_input):
     chatgpt_raw_output,source_docs = get_answer_with_ai_public(user_input)
     chatgpt_output = f"""{name}: {chatgpt_raw_output}"""
     chat_history += chatgpt_output + '\n'
-    output= f"""{chatgpt_raw_output} \n\n {source_docs}"""
+    output= f"""{chatgpt_raw_output} \n\n """
 
     return output
 
