@@ -14,11 +14,11 @@ from deep_translator import GoogleTranslator
 translator= GoogleTranslator(source='en', target='it')
 # Define the path for generated embeddings
 DB_FAISS_PATH = 'vectorstore/db_faiss'
-import os
+
 
 llm = ChatOpenAI(
     model_name="TheBloke_Mixtral-8x7B-Instruct-v0.1-GPTQ",
-    openai_api_key=os.getenv("OPENAI_KEY",None),
+    openai_api_key="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",
     openai_api_base="https://4d4z2mnsfrjdt8-5000.proxy.runpod.net/v1/"
 )
 
