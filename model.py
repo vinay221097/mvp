@@ -155,5 +155,6 @@ def run(query: str):
 
 def get_answer(query):
     input_prompt = instruction_format(sys_msg, query)
-    out = run(input_prompt)
+    output = run(input_prompt)
+    print(output)
     return output
