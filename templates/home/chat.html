@@ -74,7 +74,7 @@ body::-webkit-scrollbar {
   position: absolute;
   min-width: 300px;
   max-width: 60%;
-  height: 80%;
+  height: 94%;
   border-radius: 10px;
   background-color: #fff;
   left: 50%;
@@ -252,6 +252,7 @@ body::-webkit-scrollbar {
   box-sizing: border-box;
   width: calc(100% - 40px);
   position: absolute;
+  font-size: 12px;
   outline-width: 0;
   color: gray;
 }
@@ -403,9 +404,9 @@ height:100%;
 
 .dot {
     display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 60%;
     background-color: black;
     animation: jump 1.4s infinite linear;
     margin: 0 2px;
@@ -470,16 +471,20 @@ height:100%;
 </div>
 
 </div>
-<div class="footer">
+<!-- <div class="footer">
   <div id="button"></div>
-<div id="container">
-<div id="cont">
-<div class="footer_center">
-	   <h3>It is an AI model. &#169;    </h3>
-</div>
-</div>
-</div>
-</div>
+    <div id="container">
+        <div id="cont">
+            <div class="footer_center">
+                <h3>It is an AI model. &#169;    </h3>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+
+
 </div>
 
 
@@ -533,7 +538,7 @@ height:100%;
 
             // Temporarily add the loading indicator as a bot message
             var loadingMessage = new Message({
-                text: '<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>',
+                text: '<span class="dot"></span><span class="dot"></span><span class="dot"></span>',
                 message_side: 'left'
             });
             loadingMessage.draw();
