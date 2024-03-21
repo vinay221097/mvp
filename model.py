@@ -91,7 +91,7 @@ Let's get started. The users query is as follows.
 from sympy import *
 
 def interest_compound(capital=None,rate=None,period=None,debit=None) :
-    if income is None:
+    if capital is None:
         return "Per calcolare il tasso di interesse è necessario inserire il capitale: "
     if rate is None:
         return "Il calcolo dell'interesse di basa su un tasso %, per favore digitalo per procedere col calcolo: "
