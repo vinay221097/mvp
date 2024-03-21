@@ -128,7 +128,8 @@ def use_tool(action: dict):
     if tool_name == "Final Answer":
         return "Assistant: "+action["input"]
     elif tool_name=="InterestCalculator":
-        return exec(action["input"])
+        exec(action["input"])
+        return f"Tool Interest: {output}"
     elif tool_name == "Calculator":
         exec(action["input"])
         return f"Tool Output: {output}"
@@ -156,7 +157,7 @@ def run(query: str):
     res = generate_text(query)
     action_dict = format_output(res[0]["generated_text"])
     response = use_tool(action_dict)
-    print(response)
+    # print(response)
     full_text = f"{query}{res[0]['generated_text']}\n{response}"
     return response, full_text
 
@@ -171,5 +172,5 @@ def run(query: str):
 def get_answer(query):
     input_prompt = instruction_format(sys_msg, query)
     output,full_text = run(input_prompt)
-    print(output)
+    # print(output)
     return output
