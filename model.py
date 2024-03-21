@@ -104,7 +104,7 @@ def interest_compound(capital=None,rate=None,period=None,debit=None) :
         c,r = symbols("c,r", real=True)
         n,d = symbols("n,d", integer=True)
         n=period
-        c=income
+        c=capital
         r=rate
         d=debit
         eq=0
