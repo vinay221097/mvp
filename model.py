@@ -129,8 +129,9 @@ def use_tool(action: dict):
     if tool_name == "Final Answer":
         return "Assistant: "+action["input"]
     elif tool_name=="InterestCalculator":
-        exec(action["input"])
-        return f"Tool Interest: {output}"
+        local_vars = {}
+        exec(action["input"], globals(), local_vars)
+        return f"Tool Interest: {local_vars['output']}"
     elif tool_name == "Calculator":
         exec(action["input"])
         return f"Tool Output: {output}"
@@ -149,6 +150,7 @@ def use_tool(action: dict):
     else:
         # otherwise just assume final answer
         return action["input"]
+
 
 
 
