@@ -88,6 +88,25 @@ Remember, even when answering to the user, you must still use this JSON format! 
 Let's get started. The users query is as follows.
 """
 
+from sympy import *
+
+def interest_composite(income,rate,period,debit) :
+    #x = symbols("x")
+    eq=0
+    try:
+        c,r = symbols("c,r", real=True)
+        n,d = symbols("n,d", integer=True)
+        n=period
+        c=income
+        r=rate
+        d=debit 
+        if debit==0:
+            eq=c*(1+r*(n-d)/100)
+        else:
+            eq=d*c/(n)*(1+r*(n-d)/100)
+    except Exception as e:
+        print(e)
+    return eq
 
 
 
