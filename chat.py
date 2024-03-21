@@ -47,7 +47,7 @@ def get_answer_with_ai_public(query):
     """
 
     response= get_answer(message)
-    return ittranslator.translate(response)
+    return ittranslator.translate(response),sources
 
 
 
