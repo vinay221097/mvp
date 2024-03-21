@@ -32,74 +32,74 @@ app.jinja_loader = my_loader
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-env_file = find_dotenv(f'.env.{os.getenv("FLASK_ENV", "development")}')
+# env_file = find_dotenv(f'.env.{os.getenv("FLASK_ENV", "development")}')
 
-load_dotenv(env_file)
-uri = os.getenv('DATABASE_URI')
-DB=os.getenv('DB')
-USERSDB=os.getenv('USERSDB')
-# Create a new client and connect to the server
-client = MongoClient(uri, maxPoolSize=70)
-db = client[DB]  # Replace with your database name
-collection = db[USERSDB]  # Replace with your collection name
-
-
-def logged_in(f):
-    @wraps(f)
-    def decorated_func(*args, **kwargs):
-        if session.get("loggedin") or request.endpoint=='validate' or request.endpoint=='detailsconfirm':
-            return f(*args, **kwargs)
-        else:
-            return redirect("login")
-    return decorated_func
+# load_dotenv(env_file)
+# uri = os.getenv('DATABASE_URI')
+# DB=os.getenv('DB')
+# USERSDB=os.getenv('USERSDB')
+# # Create a new client and connect to the server
+# client = MongoClient(uri, maxPoolSize=70)
+# db = client[DB]  # Replace with your database name
+# collection = db[USERSDB]  # Replace with your collection name
 
 
+# def logged_in(f):
+#     @wraps(f)
+#     def decorated_func(*args, **kwargs):
+#         if session.get("loggedin") or request.endpoint=='validate' or request.endpoint=='detailsconfirm':
+#             return f(*args, **kwargs)
+#         else:
+#             return redirect("login")
+#     return decorated_func
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    msg=''
-    # Here we use a class of some kind to represent and validate our
-    # client-side form data. For example, WTForms is a library that will
-    # handle this for us, and we use a custom LoginForm to validate.
 
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
 
-        # Create variables for easy access
-        username = escape(request.form['username'])
-        password = escape(request.form['password'])
-        # Retrieve the hashed password
-        db = client[DB]
-        users = db[USERSDB]
-        user = users.find_one({'username': username})
-        if user:
-            if check_password_hash(user['password'],password):
-                # Create session data, we can access this data in other routes
-                session['loggedin'] = True
-                session['username'] = user['username']
-                # Redirect to home page
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     msg=''
+#     # Here we use a class of some kind to represent and validate our
+#     # client-side form data. For example, WTForms is a library that will
+#     # handle this for us, and we use a custom LoginForm to validate.
 
-                return redirect(url_for('hello'))
-            else:
-                msg = 'Email o Password errate'
-        else:
-            # Account doesnt exist or username/password incorrect
-            msg = 'Email o Password errate'
+#     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+
+#         # Create variables for easy access
+#         username = escape(request.form['username'])
+#         password = escape(request.form['password'])
+#         # Retrieve the hashed password
+#         db = client[DB]
+#         users = db[USERSDB]
+#         user = users.find_one({'username': username})
+#         if user:
+#             if check_password_hash(user['password'],password):
+#                 # Create session data, we can access this data in other routes
+#                 session['loggedin'] = True
+#                 session['username'] = user['username']
+#                 # Redirect to home page
+
+#                 return redirect(url_for('hello'))
+#             else:
+#                 msg = 'Email o Password errate'
+#         else:
+#             # Account doesnt exist or username/password incorrect
+#             msg = 'Email o Password errate'
         
 
-    return render_template('home/login.html', msg=msg)
+#     return render_template('home/login.html', msg=msg)
 
 
 
 
-@app.route('/logout')
-def logout():
-    # Remove session data, this will log the user out
-   session.pop('loggedin', None)
-   session.pop('id', None)
-   session.pop('username', None)
-   # Redirect to login page
-   return redirect(url_for('login'))
+# @app.route('/logout')
+# def logout():
+#     # Remove session data, this will log the user out
+#    session.pop('loggedin', None)
+#    session.pop('id', None)
+#    session.pop('username', None)
+#    # Redirect to login page
+#    return redirect(url_for('login'))
 
 
 
