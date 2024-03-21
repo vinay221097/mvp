@@ -11,16 +11,13 @@ from unstructured.cleaners.core import remove_punctuation,clean,clean_extra_whit
 from unstructured.cleaners.core import clean_extra_whitespace
 from langchain.schema import HumanMessage, SystemMessage
 from deep_translator import GoogleTranslator
-translator= GoogleTranslator(source='en', target='it')
+from model import *
+ittranslator= GoogleTranslator(source='en', target='it')
+entranslator= GoogleTranslator(source='it', target='en')
 # Define the path for generated embeddings
 DB_FAISS_PATH = 'vectorstore/db_faiss'
 
 
-llm = ChatOpenAI(
-    model_name="TheBloke_Mixtral-8x7B-Instruct-v0.1-GPTQ",
-    openai_api_key="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",
-    openai_api_base="https://4d4z2mnsfrjdt8-5000.proxy.runpod.net/v1/"
-)
 
 
 embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2', model_kwargs={'device': 'cpu'})
@@ -37,6 +34,7 @@ embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-
 db = FAISS.load_local(DB_FAISS_PATH, embeddings,allow_dangerous_deserialization=True)
 
 def get_answer_with_ai_public(query):
+    query=entranslator.translate(query)
 
 
     docs = db.similarity_search(query,k=3)
@@ -44,25 +42,12 @@ def get_answer_with_ai_public(query):
     data = "\n".join([doc.page_content for doc in docs])
     sources="<br>".join([doc.metadata['source'] for doc in docs])
 
-    messages = [
-            SystemMessage(
-                content=f"""You are a Financial analyst and have a decade of experience is good at analyzing the data and good at understanding the user queries and answering them based on your knowledge and information provided to you.
-                 If you do not know the answer reply with exact words "I do not know".              
-                Data: {data}
+    message=f""" Data: {data}
+    Based on the given data above can you answer {query}
+    """
+
+    response= get_answer(message)
+    return ittranslator.translate(response)
 
 
-                """
-            ),
-            HumanMessage(
-                content=query
-            ),
-        ]
-    response = llm.invoke(messages).content
-    if sources is not None and type(sources)==str:
-        response=response+sources
-    return response,""
 
-
-res=get_answer_with_ai_public("can you give me list of different mutual funds?")[0]
-tres =  translator.translate(res)
-print(tres)

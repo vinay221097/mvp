@@ -6,6 +6,7 @@ from werkzeug.security import check_password_hash
 from flask_minify import Minify
 import pandas as pd
 from datetime import date
+from chat import *
 
 app = Flask(__name__,static_url_path='/static', 
             static_folder='static',
@@ -104,12 +105,58 @@ def logout():
 
 
 
+
+chatgpt_output = 'Chat log: /n'
+cwd = os.getcwd()
+i = 1
+
+
+
+
+@app.route("/get")
+# Function for the bot response
+def get_bot_response():
+    userText = request.args.get('msg')
+    return str(get_response(userText))
+
+# Initialize chat history
+chat_history = ''
+
+
+
+# Function to handle user chat input
+def chat(user_input):
+    global chat_history, name, chatgpt_output
+    current_day = time.strftime("%d/%m", time.localtime())
+    current_time = time.strftime("%H:%M:%S", time.localtime())
+    chat_history += f'\nUser: {user_input}\n'
+    chatgpt_raw_output,source_docs = get_answer_with_ai_public(user_input)
+    chatgpt_output = f"""{name}: {chatgpt_raw_output}"""
+    chat_history += chatgpt_output + '\n'
+    output= f"""{chatgpt_raw_output} \n\n {source_docs}"""
+
+    return output
+
+# Function to get a response from the chatbot
+def get_response(userText):
+    return chat(userText)
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/')
 def hello():
-    if 'loggedin' not in session:
-        return redirect(url_for('login'))
+    # if 'loggedin' not in session:
+    #     return redirect(url_for('login'))
 
-    return render_template("home/index.html", machine_df=df)
+    return render_template("home/chat.html")
 
 
 @app.route('/static')
