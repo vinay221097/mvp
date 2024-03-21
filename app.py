@@ -107,9 +107,14 @@ logger = logging.getLogger(__name__)
 
 
 chatgpt_output = 'Chat log: /n'
+
 cwd = os.getcwd()
 i = 1
+# Define the name of the bot
+name = 'Finn'
 
+# Define the role of the bot
+role = 'Assistant'
 
 
 
