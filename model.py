@@ -156,6 +156,7 @@ def run(query: str):
     res = generate_text(query)
     action_dict = format_output(res[0]["generated_text"])
     response = use_tool(action_dict)
+    print(response)
     full_text = f"{query}{res[0]['generated_text']}\n{response}"
     return response, full_text
 
