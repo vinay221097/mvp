@@ -40,7 +40,7 @@ def get_answer_with_ai_public(query):
     docs = db.similarity_search(query,k=3)
     # print(docs)
     data = "\n".join([doc.page_content for doc in docs])
-    sources="<br>".join([doc.metadata['source']+" "+ doc.metadata["page_number"] for doc in docs])
+    sources="<br>".join([doc.metadata['source']+"  page number:"+ str(doc.metadata["page_number"]) for doc in docs])
 
     message=f""" Data: {data}
     Based on the given data above can you answer {query}
