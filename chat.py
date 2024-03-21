@@ -46,7 +46,7 @@ def get_answer_with_ai_public(query):
     message=f""" Data: {data}
     Based on the given data above can you answer {query}
     """
-    # print("Message",message)
+    print("Message",message)
 
     response= get_answer(message)
     return ittranslator.translate(response),sources
