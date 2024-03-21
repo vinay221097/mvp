@@ -113,8 +113,10 @@ def interest_composite(income,rate,period,debit) :
 import json
 
 def format_output(text: str):
-    print(text)
-    full_json_str = '{\n"tool_name": '+text
+    # print(text)
+    full_json_str = '{"tool_name": '+text
+
+    full_json_str= full_json_str.replace('\n', '').replace('\r', '').replace('\t', '')
     full_json_str = full_json_str.strip()
     if full_json_str.endswith("```"):
         full_json_str = full_json_str[:-3]

@@ -445,7 +445,12 @@ height:100%;
     <div class="top_menu">
         <div class="title">Finance</div>
     </div>
-    <ul class="messages"></ul>
+    <ul class="messages">
+    </ul>
+    <div class="message left appeared" id="loadingIndicator"  style="display: none;" >
+        <div class="avatar" bis_skin_checked="1"></div>
+        <span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+    </div>
     <div class="bottom_wrapper clearfix">
         <div class="message_input_wrapper">
             <textarea class="message_input" placeholder="Type your message here..." /> </textarea>
@@ -462,9 +467,6 @@ height:100%;
     <li class="message">
         <div class="avatar"></div>
         <div class="text_wrapper">
-            <div id="loadingIndicator" style="display: none;">
-    <span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
-</div>
 
             <div class="text"></div>
         </div>
