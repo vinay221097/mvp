@@ -36,7 +36,7 @@ sys_msg = """You are a helpful AI assistant, you are an agent capable of using a
 - Calculator: the calculator should be used whenever you need to perform a calculation, no matter how simple. It uses Python so make sure to write complete Python code required to perform the calculation required and make sure the Python returns your answer to the `output` variable.
 - Search: the search tool should be used whenever you need to find information. It can be used to find information about everything
 - Final Answer: the final answer tool must be used to respond to the user. You must use this when you have decided on an answer.
-- InterestCalculator: the InterestCalculator should be used whenever you need to calculate interest for given capital, rate and period, and debit. It uses python so make sure to write the Python code required to perform the  calculation required and make sure the Python returns your answer to the `output` variable.
+- InterestCalculator: the InterestCalculator should be used whenever you need to calculate interest for given capital, rate and period, and debit. if any of the values are missing from the question use None value as parameters so we dont get any error. It uses python so make sure to write the Python code required to perform the  calculation required and make sure the Python returns your answer to the `output` variable.
 - RAG: The RAG is used whenever the user provided data along with the question and ask you answer about the question using above data.  
 If you think that particular tool can be used but are missing any information for a particular tool ask the missing information from the user and then use the tool. 
 To use these tools you must always respond in JSON format containing `"tool_name"` and `"input"` key-value pairs. For example, to answer the question, "what is the square root of 51?" you must use the calculator tool like so:
@@ -52,7 +52,7 @@ or to answer "what is the interest for capital of 5000 euro for rate of 3%  for 
 ```json
 {
     "tool_name": "InterestCalculator",
-    "input":"output=interest_composite(5000,3,4,2)"
+    "input":"output=interest_simple(income=5000,rate=3,period=4,debit=2)"
 }
 ```
 
@@ -90,20 +90,28 @@ Let's get started. The users query is as follows.
 
 from sympy import *
 
-def interest_composite(income,rate,period,debit) :
+def interest_simple(income=None,rate=None,period=None,debit=None) :
+    if income is None:
+        return "Per calcolare il tasso di interesse è necessario inserire il capitale: "
+    if rate is None:
+        return "Il calcolo dell'interesse di basa su un tasso %, per favore digitalo per procedere col calcolo: "
+    if period is None:
+        return "Il calcolo dell'interesse dipende dalla durata del debito, digitalo per favore: "
+    if debit is None:
+        return "Per calcolare il debito ho bisogno di una durata residua, inseriscila per procedere: "
     #x = symbols("x")
-    eq=0
     try:
         c,r = symbols("c,r", real=True)
         n,d = symbols("n,d", integer=True)
         n=period
         c=income
         r=rate
-        d=debit 
+        d=debit
+        eq=0
         if debit==0:
-            eq=c*(1+r*(n-d)/100)
+          eq=c*(1+r*(n-d)/100) -c
         else:
-            eq=d*c/(n)*(1+r*(n-d)/100)
+          eq=d*c/(n)*(1+r*(n-d)/100) -c
     except Exception as e:
         print(e)
     return eq
