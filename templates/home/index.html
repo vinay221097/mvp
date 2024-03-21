@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Machine List - Zato</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.2.3/paper.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='home/index.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='home/style.css') }}" />
+  <script data-require="jquery@*" data-semver="1.11.0" src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='home/script.js') }}"></script>
+  <script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', () => {
+  const table = document.getElementById('myTable');
+  const rows = table.querySelectorAll('tr');
+  const searchInput = document.getElementById('searchInput');
+
+  searchInput.addEventListener('keyup', function() {
+    const searchText = searchInput.value;
+    for (let row of rows) {
+      const textNode = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+      const idNode = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+      if (textNode.includes(searchText.toLowerCase()) || idNode.includes(searchText.toLowerCase()) ) {
+        row.style.display = 'table-row';
+      } else {
+        row.style.display = 'none';
+      }
+    }
+  });
+});
+  </script>
+
+
+</head>
+<body class="A4">
+  <style data-tag="default-style-sheet">
+    *{
+      -webkit-print-color-adjust:exact;
+      
+    }
+  </style>
+  <section class="sheet padding-10mm frontpage">
+      <div class="home-container081">
+          <a  class="button" href="{{url_for('logout')}}" id="logout">Logout</a>
+          
+  </div>
+
+   
+      <!-- <span class="home-text088">Machine Name</span>
+      <br> -->
+       
+    <input type="text" name="machine_id"  placeholder="Enter Machine Name"  class="textarea home-textarea" style="height: auto;" id="searchInput">
+
+
+
+  <table class="table" id="myTable">
+      <thead>
+        <tr >
+          <span></span>
+          <td style="color:  #888888;">Machine ID</td>
+          
+          <td style="color:  #888888;">Machine Name</td>
+           
+        </tr>
+      </thead>
+      <tbody>
+        {% for idx, row in machine_df.iterrows() %}
+        <tr >
+
+          <td> 
+            <a  class="btn-link" href="{{ url_for('machine',machineid=row['machine_id']) }}" >{{row['machine_id']}}</a>
+          </td>
+          <td>{{ row['machine_name']  }}</td>
+        </tr>
+
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+  
+  </section>
+  
+</body>
+
+</html>
