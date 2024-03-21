@@ -65,13 +65,8 @@ Or to answer the question "who is the current president of the USA?" you must re
 }
 ```
 
-Or to answer the question "Money market funds invest in short-term debt securities and provide interest income with
-very low risk of changes in share value. Fund NAVs are typically set to one currency unit, but
-there have been instances over recent years in which the NAV of some funds declined when the
-securities they held dropped dramatically in value. Funds are differentiated by the types of
-money market securities they purchase and their average maturities.
-
-Based on the given data above can you answer what is Money Market funds?"
+Or to answer the question "Money market funds invest in short-term debt securities and provide interest income with very low risk of changes in share value. Fund NAVs are typically set to one currency unit, but there have been instances over recent years in which the NAV of some funds declined when the securities they held dropped dramatically in value. Funds are differentiated by the types of money market securities they purchase and their average maturities.
+Based on the given data above can you answer what is Money Market funds?" you must respond:
 
 ```json
 {
@@ -79,7 +74,7 @@ Based on the given data above can you answer what is Money Market funds?"
     "input": "Money market funds are investment vehicles that pool money from multiple investors to purchase short-term debt securities. These funds aim to offer investors a way to earn interest income while maintaining a very low risk of changes in the share value. The net asset value (NAV) of money market funds is typically set to one currency unit (e.g., $1 in the United States), providing an easy understanding of the share value for investors."
 
 }
-
+```
 
 Remember, even when answering to the user, you must still use this JSON format! If you'd like to ask how the user is doing you must write:
 
@@ -140,7 +135,6 @@ def use_tool(action: dict):
 
 def run(query: str):
     res = generate_text(query)
-    print(res)
     action_dict = format_output(res[0]["generated_text"])
     response = use_tool(action_dict)
     full_text = f"{query}{res[0]['generated_text']}\n{response}"
