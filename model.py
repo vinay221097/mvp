@@ -132,7 +132,7 @@ def use_tool(action: dict):
         return f"Tool Output: {info}"
     else:
         # otherwise just assume final answer
-        return "Assistant: "+action["input"]
+        return action["input"]
 
 
 
@@ -155,6 +155,6 @@ def run(query: str):
 
 def get_answer(query):
     input_prompt = instruction_format(sys_msg, query)
-    output = run(input_prompt)
+    output = run(input_prompt)[0]
     print(output)
     return output
