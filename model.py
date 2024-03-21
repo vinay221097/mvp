@@ -140,6 +140,7 @@ def use_tool(action: dict):
 
 def run(query: str):
     res = generate_text(query)
+    print(res)
     action_dict = format_output(res[0]["generated_text"])
     response = use_tool(action_dict)
     full_text = f"{query}{res[0]['generated_text']}\n{response}"
