@@ -12,6 +12,7 @@ from unstructured.cleaners.core import clean_extra_whitespace
 from langchain.schema import HumanMessage, SystemMessage
 from deep_translator import GoogleTranslator
 from model import *
+from utils import *
 ittranslator= GoogleTranslator(source='en', target='it')
 entranslator= GoogleTranslator(source='it', target='en')
 # Define the path for generated embeddings
