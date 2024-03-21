@@ -124,6 +124,7 @@ from duckduckgo_search import DDGS
 
 def use_tool(action: dict):
     print(action)
+    output=''
     tool_name = action["tool_name"]
     if tool_name == "Final Answer":
         return "Assistant: "+action["input"]
