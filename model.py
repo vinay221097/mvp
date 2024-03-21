@@ -113,6 +113,7 @@ def interest_composite(income,rate,period,debit) :
 import json
 
 def format_output(text: str):
+    print(text)
     full_json_str = '{\n"tool_name": '+text
     full_json_str = full_json_str.strip()
     if full_json_str.endswith("```"):
@@ -158,7 +159,7 @@ def use_tool(action: dict):
 
 def run(query: str):
     res = generate_text(query)
-    print(res)
+    # print(res)
     action_dict = format_output(res[0]["generated_text"])
     response = use_tool(action_dict)
     # print(response)
@@ -176,5 +177,5 @@ def run(query: str):
 def get_answer(query):
     input_prompt = instruction_format(sys_msg, query)
     output,full_text = run(input_prompt)
-    print(output)
+    # print(output)
     return output
