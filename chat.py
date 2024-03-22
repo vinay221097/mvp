@@ -32,7 +32,7 @@ embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-
 # db.save_local(DB_FAISS_PATH)
 
 
-# db = FAISS.load_local(DB_FAISS_PATH, embeddings,allow_dangerous_deserialization=True)
+db = FAISS.load_local(DB_FAISS_PATH, embeddings,allow_dangerous_deserialization=True)
 
 def get_answer_with_ai_public(query):
     query=entranslator.translate(query)
