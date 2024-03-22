@@ -10,7 +10,7 @@ def interest_compound(capital=None,rate=None,period=None,debit=None) :
     if period is None:
         return "Il calcolo dell'interesse dipende dalla durata del debito, digitalo per favore: "
     if debit is None:
-        return "Per calcolare il debito ho bisogno di una durata residua, inseriscila per procedere: "
+        debit=0
     #x = symbols("x")
     try:
         c,r = symbols("c,r", real=True)
