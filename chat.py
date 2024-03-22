@@ -11,7 +11,7 @@ from unstructured.cleaners.core import remove_punctuation,clean,clean_extra_whit
 from unstructured.cleaners.core import clean_extra_whitespace
 from langchain.schema import HumanMessage, SystemMessage
 from deep_translator import GoogleTranslator
-from model import *
+# from model import *
 from utils import *
 ittranslator= GoogleTranslator(source='en', target='it')
 entranslator= GoogleTranslator(source='it', target='en')
@@ -23,33 +23,33 @@ DB_FAISS_PATH = 'vectorstore/db_faiss'
 
 embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2', model_kwargs={'device': 'cpu'})
 
-# loader = UnstructuredFileLoader("financedata.pdf",post_processors=[clean,remove_punctuation,clean_extra_whitespace])
-# data= loader.load()
+loader = UnstructuredFileLoader("financedata.pdf",post_processors=[clean,remove_punctuation,clean_extra_whitespace],mode="elements")
+data= loader.load()
 
 
 
-# db = FAISS.from_documents(data, embeddings)
-# db.save_local(DB_FAISS_PATH)
+db = FAISS.from_documents(data, embeddings)
+db.save_local(DB_FAISS_PATH)
 
 
 db = FAISS.load_local(DB_FAISS_PATH, embeddings,allow_dangerous_deserialization=True)
 
-def get_answer_with_ai_public(query):
-    query=entranslator.translate(query)
+# def get_answer_with_ai_public(query):
+#     query=entranslator.translate(query)
 
 
-    docs = db.similarity_search(query,k=3)
-    # print(docs)
-    data = "\n".join([doc.page_content for doc in docs])
-    sources="<br>".join([doc.metadata['source']+"  page number:"+ str(doc.metadata["page_number"]) for doc in docs])
+#     docs = db.similarity_search(query,k=3)
+#     # print(docs)
+#     data = "\n".join([doc.page_content for doc in docs])
+#     sources="<br>".join([doc.metadata['source']+"  page number:"+ str(doc.metadata["page_number"]) for doc in docs])
 
-    message=f""" Data: {data}
-    Based on the given data above can you answer {query}
-    """
-    print("Message",message)
+#     message=f""" Data: {data}
+#     Based on the given data above can you answer {query}
+#     """
+#     print("Message",message)
 
-    response= get_answer(message)
-    return ittranslator.translate(response),sources
+#     response= get_answer(message)
+#     return ittranslator.translate(response),sources
 
 
 
