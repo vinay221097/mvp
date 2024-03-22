@@ -66,7 +66,7 @@ Or to answer the question "who is the current president of the USA?" you must re
 ```
 
 Or to answer the question "Money market funds invest in short-term debt securities and provide interest income with very low risk of changes in share value. Fund NAVs are typically set to one currency unit, but there have been instances over recent years in which the NAV of some funds declined when the securities they held dropped dramatically in value. Funds are differentiated by the types of money market securities they purchase and their average maturities.
-Based on the given data above can you answer what is Money Market funds?" you must respond:
+Based on the given data above can you answer what is Money Market funds?" you must respond but remember if the data provided it not related to the question at all then you do not use this tool instead use "Search" tool:
 
 ```json
 {
