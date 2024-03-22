@@ -126,6 +126,7 @@ def format_output(text: str):
 
     full_json_str= full_json_str.replace('\n', '').replace('\r', '').replace('\t', '')
     full_json_str = full_json_str.strip()
+    print(full_json_str)
     if full_json_str.endswith("```"):
         full_json_str = full_json_str[:-3]
     return json.loads(full_json_str)
