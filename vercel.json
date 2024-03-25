@@ -1,6 +1,5 @@
 {
-  "builds": [
-    {"src": "gunicorn.sh", "use": "@now/python"}
-  ],
-
+  "rewrites": [
+    { "source": "/(.*)", "destination": "app" }
+  ]
 }
