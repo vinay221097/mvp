@@ -1,0 +1,6 @@
+{
+  "builds": [
+    {"src": "gunicorn.sh", "use": "@now/python"}
+  ],
+
+}

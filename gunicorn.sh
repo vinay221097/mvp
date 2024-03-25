@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-set -o errexit
-set -o nounset
 
 # We are using `gunicorn` for production, see:
 # http://docs.gunicorn.org/en/stable/configure.html
