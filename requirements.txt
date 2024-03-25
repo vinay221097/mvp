@@ -13,8 +13,5 @@ langsmith==0.1.23
 sentence-transformers==2.5.1
 duckduckgo_search==4.1.0
 sympy==1.12
-deep-translator==1.11.4
 unstructured==0.12.6
-unstructured-client==0.18.0
-unstructured-inference==0.7.23
 gunicorn
