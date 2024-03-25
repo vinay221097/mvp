@@ -13,6 +13,3 @@ gunicorn app:app \
     --max-requests-jitter=400 \
     --timeout=180 \
     --bind='0.0.0.0:8000' `# Run Flask on 8000 port` \
-    --chdir='/code'       `# Locations` \
-    --log-file=- \
-    --worker-tmp-dir='/dev/shm'
