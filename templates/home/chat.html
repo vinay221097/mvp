@@ -28,6 +28,26 @@ body {
     }
 }
 
+#image-popup {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+#image-popup img {
+  max-width: 80%;
+  max-height: 80%;
+  box-shadow: 0 0 10px #ffffff;
+  border-radius: 8px;
+}
+
 body::-webkit-scrollbar {
   width: 12px;               /* width of the entire scrollbar */
 }
@@ -489,7 +509,7 @@ height:100%;
 
 
 
-
+<!-- 
 <script>
 (function () {
     var Message;
@@ -510,7 +530,8 @@ height:100%;
     };
 
     $(function () {
-        var getMessageText, sendMessage;
+        var getMessageText, sendMessage, displayInitialGreeting;
+        
         getMessageText = function () {
             var $message_input;
             $message_input = $('.message_input');
@@ -525,41 +546,47 @@ height:100%;
             $('.message_input').val('');
             $messages = $('.messages');
 
-            // Set message_side based on whether the message is from the user or chatbot
             var message_side = 'right';
-
             message = new Message({
                 text: text,
                 message_side: message_side
             });
-
-            // Draw user message
             message.draw();
 
-            // Temporarily add the loading indicator as a bot message
             var loadingMessage = new Message({
                 text: '<span class="dot"></span><span class="dot"></span><span class="dot"></span>',
                 message_side: 'left'
             });
             loadingMessage.draw();
 
-            // Call getResponse() to get the chatbot's response
             $.get("/get", { msg: text }).done(function(data) {
-                // Once the message is received, replace the loading indicator with the actual message
+                $('.messages .message:last-child').remove(); // Remove the loading indicator message
+                
+                var messageContent;
+                if (data.rtype === "image") {
+                    messageContent = '<img src="data:image/png;base64,' + data.result + '" style="max-width: 100%; display: block; margin: 0 auto;"/>';
+                } else {
+                    messageContent = data.result;
+                }
+                
                 var botMessage = new Message({
-                    text: data,
+                    text: messageContent,
                     message_side: 'left'
                 });
-
-                // Remove the loading indicator message
-                $('.messages .message:last-child').remove();
-
-                // Draw bot message
                 botMessage.draw();
+                
                 $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
             });
 
             return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+        };
+
+        displayInitialGreeting = function() {
+            var greetingMessage = new Message({
+                text: 'Sono Finn, come posso aiutarti oggi? Sono sempre pronto ad assistervi in modo rapido ed efficiente. Basta digitare!',
+                message_side: 'left'
+            });
+            greetingMessage.draw();
         };
 
         $('.send_message').click(function (e) {
@@ -571,17 +598,123 @@ height:100%;
             }
         });
 
-        // Initial greeting message from the bot
-        var writingMessage = new Message({
-            text: 'Sono Finn, come posso aiutarti oggi? Sono sempre pronto ad assistervi in modo rapido ed efficiente. Basta digitare!',
-            message_side: 'left'
-        });
-        writingMessage.draw();
+        // Display the initial greeting message from the bot when the page loads
+        displayInitialGreeting();
     });
 }.call(this));
 </script>
+ -->
 
 
+<script>
+(function () {
+    var Message;
+    Message = function (arg) {
+        this.text = arg.text, this.message_side = arg.message_side;
+        this.draw = function (_this) {
+            return function () {
+                var $message;
+                $message = $($('.message_template').clone().html());
+                $message.addClass(_this.message_side).find('.text').html(_this.text);
+                // Add click event for images within this message
+                $message.find('img').on('click', function() {
+                    showImagePopup(this.src);
+                });
+                $('.messages').append($message);
+                return setTimeout(function () {
+                    return $message.addClass('appeared');
+                }, 0);
+            };
+        }(this);
+        return this;
+    };
+
+    function showImagePopup(src) {
+        var popup = $('#image-popup');
+        if (popup.length === 0) {
+            $('body').append('<div id="image-popup" onclick="hideImagePopup()"><img src="' + src + '"></div>');
+            popup = $('#image-popup');
+        } else {
+            popup.find('img').attr('src', src);
+        }
+        popup.show();
+    }
+
+    window.hideImagePopup = function() {
+        $('#image-popup').hide();
+    }
+
+    $(function () {
+        var getMessageText, sendMessage, displayInitialGreeting;
+
+        getMessageText = function () {
+            var $message_input = $('.message_input');
+            return $message_input.val();
+        };
+
+        sendMessage = function (text) {
+            var $messages = $('.messages'), message;
+            if (text.trim() === '') {
+                return;
+            }
+            $('.message_input').val('');
+
+            var message_side = 'right';
+            message = new Message({
+                text: text,
+                message_side: message_side
+            });
+            message.draw();
+
+            var loadingMessage = new Message({
+                text: '<span class="dot"></span><span class="dot"></span><span class="dot"></span>',
+                message_side: 'left'
+            });
+            loadingMessage.draw();
+
+            $.get("/get", { msg: text }).done(function(data) {
+                $('.messages .message:last-child').remove(); // Remove the loading indicator message
+                
+                var messageContent;
+                if (data.rtype === "image") {
+                    messageContent = '<img src="data:image/png;base64,' + data.result + '" style="max-width: 100%; display: block; margin: 0 auto;"/>';
+                } else {
+                    messageContent = data.result;
+                }
+                
+                var botMessage = new Message({
+                    text: messageContent,
+                    message_side: 'left'
+                });
+                botMessage.draw();
+                
+                $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
+            });
+        };
+
+        displayInitialGreeting = function() {
+            var greetingMessage = new Message({
+                text: 'Sono Finn, come posso aiutarti oggi? Sono sempre pronto ad assistervi in modo rapido ed efficiente. Basta digitare!',
+                message_side: 'left'
+            });
+            greetingMessage.draw();
+        };
+
+        $('.send_message').click(function () {
+            sendMessage(getMessageText());
+        });
+
+        $('.message_input').keyup(function (e) {
+            if (e.which === 13) {
+                sendMessage(getMessageText());
+            }
+        });
+
+        // Trigger the initial greeting message
+        displayInitialGreeting();
+    });
+}.call(this));
+</script>
 
 </body>
 </html>

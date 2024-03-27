@@ -2,17 +2,18 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from langchain.document_loaders.csv_loader import CSVLoader
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.document_loaders import UnstructuredFileLoader
-from langchain.chat_models import ChatOpenAI
+
 from unstructured.cleaners.core import remove_punctuation,clean,clean_extra_whitespace
 from unstructured.cleaners.core import clean_extra_whitespace
 from langchain.schema import HumanMessage, SystemMessage
 from deep_translator import GoogleTranslator
-from model2 import *
+
 from utils import *
+from model2 import *
 ittranslator= GoogleTranslator(source='en', target='it')
 entranslator= GoogleTranslator(source='it', target='en')
 # Define the path for generated embeddings
@@ -39,6 +40,7 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          We have provided you with the data related to finance 101 which contains basic information about stocks, mutual funds and other some basic stuff related to it.
                          so now your job is tell if the user is asking a question related to this information you have or something else.
                          Also if the user is asking about something like calculate interest and provided some values then also i suggest you return False to such questions.
+                         Remember when user is asking info about specific stock info provided symbol and timeperiod you do not have that info we have seperate function for it. you only have info about general information on background of finance.
 
                          example if user asks a question like "what is capital of france?" you must respond with json output:
                          ```json
@@ -65,6 +67,25 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          "result": "false"
                          }
                          ```
+
+                         but if user asks a question about information about a stock and asking info about it  like "What is the stock price of symbol CCL from jan 2023 to may 2023" something like you must respond like this:
+
+                        ```json
+                         {
+                         "toolname":"Check",
+                         "result": "false"
+                         }
+                         ```
+                        but if user asks a question about information about a stock and provided a symbol and a starting date and asking info about it  like "What is the stock price of symbol CCL for last 5 months" something like you must respond like this:
+
+                        ```json
+                         {
+                         "toolname":"Check",
+                         "result": "false"
+                         }
+                         ```
+
+
                          Remember you must repond to user only in the structure provided above as examples.you only have to respone the json structure and nothing else no additional explanation or addition text is needed"""
 
 
@@ -95,10 +116,15 @@ def get_answer_with_ai_public(query):
         print("Message",message)
 
         response= get_answer(message)
-        return ittranslator.translate(response),sources
+        if response['rtype']=='text':
+            response['result']= ittranslator.translate(response['result'])
+        return response
     else:
         response=get_answer(query)
-        return ittranslator.translate(response),""
+        if response['rtype']=='text':
+            response['result']= ittranslator.translate(response['result'])
+        return response
+
 
 
 

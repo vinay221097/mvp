@@ -1,5 +1,5 @@
 import replicate
-
+from utils import *
 
 def generate_text(prompt_input,system_prompt):
     output = replicate.run(
@@ -27,20 +27,30 @@ def instruction_format(sys_message: str):
 
 sys_msg = """You are a helpful AI assistant, you are an agent capable of using a variety of tools to answer a question. Here are a few of the tools available to you:
 
-- Calculator: the calculator should be used whenever you need to perform a calculation, no matter how simple. It uses Python so make sure to write complete Python code required to perform the calculation required and make sure the Python returns your answer to the `output` variable.
+- Stocker: the Stocker should be used whenever you need to find information about a stock provided its symbol and a start date, you must understand the dates passed and convert them to a way that python code can understand.  It uses Python so make sure to write complete Python code required to perform the calculation required and make sure the Python returns your answer to the `output` variable.
 - Search: the search tool should be used whenever you need to find information. It can be used to find information about everything
 - Final Answer: the final answer tool must be used to respond to the user. You must use this when you have decided on an answer.
 - InterestCalculator: the InterestCalculator should be used whenever you need to calculate interest for given capital, rate and period, and debit. if any of the values are missing from the question use None value as parameters so we dont get any error. It uses python so make sure to write the Python code required to perform the  calculation required and make sure the Python returns your answer to the `output` variable.
 - RAG: The RAG is used whenever the user provided data along with the question and ask you answer about the question using above data.  
+-
 If you think that particular tool can be used but are missing any information for a particular tool ask the missing information from the user and then use the tool. 
-To use these tools you must always respond in JSON format containing `"toolname"` and `"input"` key-value pairs. For example, to answer the question, "what is the square root of 51?" you must use the calculator tool like so:
+To use these tools you must always respond in JSON format containing `"toolname"` and `"input"` key-value pairs.
+ For example, to answer the question, "What is the stock price of symbol CCL for since seven days?" you must use the Stocker tool like so:
 
 ```json
 {
-    "toolname": "Calculator",
-    "input": "from math import sqrt; output = sqrt(51)"
+    "toolname": "Stocker",
+    "input": "import datetime as DT;output=get_stock_data(ticker='CCL', start_date=DT.date.today()+DT.timedelta(days=-7),end_date=None)"
 }
 ```
+or to answer a question like "What is the stock price of symbol CCL from jan 2023 to may 2023?" you must use the Stocker tool like so:
+```json
+{
+    "toolname": "Stocker",
+    "input": "import datetime as DT;output=get_stock_data(ticker='CCL', start_date='2023-01-01',end_date='2023-05-31')"
+}
+```
+
 or to answer "what is the interest for capital of 5000 euro for rate of 3%  for 4 years and debit in 2 years?"  you must use the InterestCalculator tool like so:
 
 ```json
@@ -135,14 +145,15 @@ def use_tool(action: dict):
     output=''
     toolname = action["toolname"]
     if toolname == "RAG":
-        return action["input"]
+        return {"rtype":"text","result":action["input"]}
     elif toolname=="InterestCalculator":
         local_vars = {}
         exec(action["input"], globals(), local_vars)
-        return f"Tool Interest: {local_vars['output']}"
-    elif toolname == "Calculator":
-        exec(action["input"])
-        return f"Tool Output: {output}"
+        return {"rtype":"text","result":f"Tool Interest: {local_vars['output']}"}
+    elif toolname == "Stocker":
+        local_vars = {}
+        exec(action["input"], globals(), local_vars)
+        return {"rtype":"image","result":f"{local_vars['output']}"}
     elif toolname == "Search":
         contexts = []
         with DDGS() as ddgs:
@@ -154,10 +165,10 @@ def use_tool(action: dict):
             for r in results:
                 contexts.append(r['body'])
         info = "\n---\n".join(contexts)        
-        return f"Tool Output: {info}"
+        return {"rtype":"text","result":f"Tool Output: {info}"}
     else:
         # otherwise just assume final answer
-        return action["input"]
+        return {"rtype":"text","result":action["input"]}
 
 
 
@@ -170,8 +181,8 @@ def run(query: str,system_prompt):
     action_dict = format_output(res)
     response = use_tool(action_dict)
     # print(response)
-    full_text = f"{query}{res}\n{response}"
-    return response, full_text
+
+    return response
 
 
 
@@ -182,7 +193,7 @@ def run(query: str,system_prompt):
 
 def get_answer(query):
     system_prompt = instruction_format(sys_msg)
-    output,full_text = run(query,system_prompt)
+    output = run(query,system_prompt)
     # print(output)
     return output
 

@@ -1,18 +1,23 @@
 import datetime, os, logging
 import jinja2, sys, time
-from flask import Flask, Response, render_template, request,session,redirect,url_for
+from flask import Flask, Response, render_template, request,session,redirect,url_for,jsonify
 from html import escape
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash,generate_password_hash
+from flask_sqlalchemy import SQLAlchemy
 from flask_minify import Minify
 import pandas as pd
+import hashlib
 from datetime import date
 from utils import *
 from chat import *
+import sqlite3
 app = Flask(__name__,static_url_path='/static', 
             static_folder='static',
             template_folder='templates')
 
 # random string
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "af95d160b65aac2494ce48226202559d1f82563"
 
 Minify(app=app, html=True, js=False, cssless=False)
@@ -34,72 +39,74 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 # env_file = find_dotenv(f'.env.{os.getenv("FLASK_ENV", "development")}')
 
-# load_dotenv(env_file)
-# uri = os.getenv('DATABASE_URI')
-# DB=os.getenv('DB')
-# USERSDB=os.getenv('USERSDB')
-# # Create a new client and connect to the server
-# client = MongoClient(uri, maxPoolSize=70)
-# db = client[DB]  # Replace with your database name
-# collection = db[USERSDB]  # Replace with your collection name
 
 
-# def logged_in(f):
-#     @wraps(f)
-#     def decorated_func(*args, **kwargs):
-#         if session.get("loggedin") or request.endpoint=='validate' or request.endpoint=='detailsconfirm':
-#             return f(*args, **kwargs)
-#         else:
-#             return redirect("login")
-#     return decorated_func
+
+# db = SQLAlchemy(app)
+con = sqlite3.connect("users.db")
 
 
 
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     msg=''
-#     # Here we use a class of some kind to represent and validate our
-#     # client-side form data. For example, WTForms is a library that will
-#     # handle this for us, and we use a custom LoginForm to validate.
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    msg = ''
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
 
-#     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        # Connect to the database
+        conn = sqlite3.connect('users.db')
+        cursor = conn.cursor()
 
-#         # Create variables for easy access
-#         username = escape(request.form['username'])
-#         password = escape(request.form['password'])
-#         # Retrieve the hashed password
-#         db = client[DB]
-#         users = db[USERSDB]
-#         user = users.find_one({'username': username})
-#         if user:
-#             if check_password_hash(user['password'],password):
-#                 # Create session data, we can access this data in other routes
-#                 session['loggedin'] = True
-#                 session['username'] = user['username']
-#                 # Redirect to home page
+        # Check if the username already exists
+        cursor.execute("SELECT * FROM user WHERE username=?", (username,))
+        existing_user = cursor.fetchone()
+        if existing_user:
+            msg = "Username already exists. Please choose a different one."
+        else:
+            # Hash the password before storing it
+            hashed_password = generate_password_hash(password)
 
-#                 return redirect(url_for('hello'))
-#             else:
-#                 msg = 'Email o Password errate'
-#         else:
-#             # Account doesnt exist or username/password incorrect
-#             msg = 'Email o Password errate'
-        
+            # Insert the new user into the database
+            cursor.execute("INSERT INTO user (username, password) VALUES (?, ?)", (username, hashed_password))
+            conn.commit()
+            conn.close()
 
-#     return render_template('home/login.html', msg=msg)
+            return "User registered successfully. <a href='/login'>Login</a>"
+    
+    return render_template('home/register.html', msg=msg)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    msg = ''
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
 
+        # Connect to the database
+        conn = sqlite3.connect('users.db')
+        cursor = conn.cursor()
 
+        # Retrieve the user by username
+        cursor.execute("SELECT * FROM user WHERE username=?", (username,))
+        user = cursor.fetchone()
 
-# @app.route('/logout')
-# def logout():
-#     # Remove session data, this will log the user out
-#    session.pop('loggedin', None)
-#    session.pop('id', None)
-#    session.pop('username', None)
-#    # Redirect to login page
-#    return redirect(url_for('login'))
+        if user and check_password_hash(user[2], password):
+            session['user_id'] = user[0]
+            conn.close()
+            return redirect(url_for("hello"))
+        else:
+            msg = "Invalid username or password."
+            conn.close()
+
+    return render_template('home/login.html', msg=msg)
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('index'))
+
 
 
 
@@ -119,10 +126,16 @@ role = 'Assistant'
 
 
 @app.route("/get")
-# Function for the bot response
 def get_bot_response():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     userText = request.args.get('msg')
-    return str(get_response(userText))
+    response_content = chat(userText)
+    return jsonify(response_content)
+
+
+
 
 # Initialize chat history
 chat_history = ''
@@ -131,16 +144,11 @@ chat_history = ''
 
 # Function to handle user chat input
 def chat(user_input):
-    global chat_history, name, chatgpt_output
-    current_day = time.strftime("%d/%m", time.localtime())
-    current_time = time.strftime("%H:%M:%S", time.localtime())
-    chat_history += f'\nUser: {user_input}\n'
-    chatgpt_raw_output,source_docs = get_answer_with_ai_public(user_input)
-    chatgpt_output = f"""{name}: {chatgpt_raw_output}"""
-    chat_history += chatgpt_output + '\n'
-    output= f"""{chatgpt_raw_output} \n\n """
+    chatgpt_raw_output = get_answer_with_ai_public(user_input)
+    return chatgpt_raw_output
 
-    return output
+
+
 
 # Function to get a response from the chatbot
 def get_response(userText):
@@ -158,14 +166,17 @@ def get_response(userText):
 
 @app.route('/')
 def hello():
-    # if 'loggedin' not in session:
-    #     return redirect(url_for('login'))
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
     return render_template("home/chat.html")
 
 
 @app.route('/static')
 def static_file(path):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     return app.send_static_file(path)
 
 
