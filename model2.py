@@ -186,7 +186,8 @@ def run(query: str,system_prompt):
         action_dict = format_output(res)
         response = use_tool(action_dict)
         return response
-    except:
+    except Exception as e:
+        print("exception ",e)
         if '{' in str(res) and '}' in str(res) and 'rtype' in str(res):
             return res
         else:
