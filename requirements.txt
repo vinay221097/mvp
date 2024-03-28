@@ -17,3 +17,4 @@ duckduckgo_search==4.1.0
 sympy==1.12
 unstructured
 gunicorn
+Flask-SQlAlchemy
