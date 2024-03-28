@@ -25,8 +25,7 @@ def generate_text(prompt_input,system_prompt):
 
 
 def search_answer(question):
-    wrapper = DuckDuckGoSearchAPIWrapper(region="it-it", time="d", max_results=2)
-    search = DuckDuckGoSearchResults(api_wrapper=wrapper)
+    search = DuckDuckGoSearchRun()
     res=""
     try:
         res=search.run(question)

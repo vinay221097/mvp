@@ -13,7 +13,7 @@ langchain-text-splitters
 langdetect
 langsmith
 sentence-transformers==2.5.1
-duckduckgo_search==4.1.0
+duckduckgo_search
 sympy==1.12
 unstructured
 gunicorn
