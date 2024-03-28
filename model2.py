@@ -30,8 +30,10 @@ def search_answer(question):
     res=""
     try:
         res=search.run(question)
-    except:
+    except Exception as e:
+        print(e)
         res="Sorry answer not found due to some error"
+    print(res)
     return res
 
 
