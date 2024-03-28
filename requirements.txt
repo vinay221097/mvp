@@ -15,5 +15,5 @@ langsmith==0.1.23
 sentence-transformers==2.5.1
 duckduckgo_search==4.1.0
 sympy==1.12
-unstructured==0.12.6
+unstructured
 gunicorn

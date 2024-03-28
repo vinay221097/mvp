@@ -6,7 +6,7 @@
 
 
 gunicorn app:app \
-    --workers=4 `# Sync worker settings` \
+    --workers=2 `# Sync worker settings` \
     --max-requests=2000 \
     --max-requests-jitter=400 \
     --timeout=180 \
