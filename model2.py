@@ -1,5 +1,8 @@
 import replicate
 from utils import *
+from langchain_community.tools import DuckDuckGoSearchRun
+from langchain_community.tools import DuckDuckGoSearchResults
+from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 
 def generate_text(prompt_input,system_prompt):
     output = replicate.run(
@@ -19,6 +22,20 @@ def generate_text(prompt_input,system_prompt):
     print(output)
 
     return output
+
+
+def search_answer(question):
+    wrapper = DuckDuckGoSearchAPIWrapper(region="it-it", time="d", max_results=2)
+    search = DuckDuckGoSearchResults(api_wrapper=wrapper)
+    res=""
+    try:
+        res=search.run(question)
+    except:
+        res="Sorry answer not found due to some error"
+    return res
+
+
+
 
 
 def instruction_format(sys_message: str):
@@ -159,17 +176,8 @@ def use_tool(action: dict):
         exec(action["input"], globals(), local_vars)
         return {"rtype":"image","result":f"{local_vars['output']}"}
     elif toolname == "Search":
-        contexts = []
-        with DDGS() as ddgs:
-            results = ddgs.text(
-                action["input"],
-                region="wt-wt", safesearch="on",
-                max_results=3
-            )
-            for r in results:
-                contexts.append(r['body'])
-        info = "\n---\n".join(contexts)        
-        return {"rtype":"text","result":f"Tool Output: {info}"}
+        res=search_answer(action["input"])
+        return {"rtype":"text","result": res}
     else:
         # otherwise just assume final answer
         return {"rtype":"text","result":action["input"]}
