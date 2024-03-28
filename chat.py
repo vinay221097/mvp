@@ -102,7 +102,7 @@ def get_answer_with_ai_public(query):
     query=entranslator.translate(query)
 
     res = generate_text(query,check_finance_prompt)
-    print(res)
+    # print(res)
     action_dict = format_output(res)
     if action_dict['result']=="true":
         docs = db.similarity_search(query,k=3)
@@ -113,7 +113,7 @@ def get_answer_with_ai_public(query):
         message=f""" Data: {data}
         Based on the given data above can you answer {query}
         """
-        print("Message:",message)
+        # print("Message:",message)
 
         response= get_answer(message)
         if response['rtype']=='text':

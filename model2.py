@@ -19,7 +19,7 @@ def generate_text(prompt_input,system_prompt):
     }
 )
     output ="".join(output)
-    print(output)
+    # print(output)
 
     return output
 
@@ -32,7 +32,7 @@ def search_answer(question):
     except Exception as e:
         print(e)
         res="Sorry answer not found due to some error"
-    print(res)
+    # print(res)
     return res
 
 
@@ -154,7 +154,7 @@ def format_output(text: str):
 from duckduckgo_search import DDGS
 
 def use_tool(action: dict):
-    print(action)
+    # print(action)
     output=''
     toolname = action["toolname"]
     if toolname == "RAG":
