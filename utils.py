@@ -6,6 +6,8 @@ import io
 import matplotlib.pyplot as plt
 import base64
 import matplotlib
+import re
+import json
 matplotlib.use('Agg')
 
 def interest_compound(capital=None,rate=None,period=None,debit=None) :
@@ -36,6 +38,18 @@ def interest_compound(capital=None,rate=None,period=None,debit=None) :
 
 
 
+
+def extract_json_from_string(text):
+    regex = r"\{(?:[^{}]|(?:\"(?:\\.|[^\"\\])*\")|\{(?:[^{}]|(?:\"(?:\\.|[^\"\\])*\"))*\})*\}"
+    matches = re.findall(regex, text)
+    output = {}
+    if len(matches) > 0:
+        temp = matches[0]
+        if type(temp) == str:
+            output = json.loads(temp)
+        elif type(temp) == dict:
+            output = temp
+    return output
 
 
 def parse_date(date_str):

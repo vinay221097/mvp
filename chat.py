@@ -41,6 +41,7 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          so now your job is tell if the user is asking a question related to this information you have or something else.
                          Also if the user is asking about something like calculate interest and provided some values then also i suggest you return False to such questions.
                          Remember when user is asking info about specific stock info provided symbol and timeperiod you do not have that info we have seperate function for it. you only have info about general information on background of finance.
+                         You must respond only the json strucutre output in format provided below and nothing else. Do not answer Beyond the strucutre provided to you as examples.
 
                          example if user asks a question like "what is capital of france?" you must respond with json output:
                          ```json
@@ -84,9 +85,7 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          "result": "false"
                          }
                          ```
-
-
-                         Remember you must repond to user only in the structure provided above as examples.you only have to respone the json structure and nothing else no additional explanation or addition text is needed"""
+"""
 
 
 
@@ -103,6 +102,7 @@ def get_answer_with_ai_public(query):
     query=entranslator.translate(query)
 
     res = generate_text(query,check_finance_prompt)
+    print(res)
     action_dict = format_output(res)
     if action_dict['result']=="true":
         docs = db.similarity_search(query,k=3)
@@ -113,7 +113,7 @@ def get_answer_with_ai_public(query):
         message=f""" Data: {data}
         Based on the given data above can you answer {query}
         """
-        print("Message",message)
+        print("Message:",message)
 
         response= get_answer(message)
         if response['rtype']=='text':

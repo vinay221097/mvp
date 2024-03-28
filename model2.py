@@ -3,7 +3,7 @@ from utils import *
 from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
-
+import re,json
 def generate_text(prompt_input,system_prompt):
     output = replicate.run(
     "mistralai/mixtral-8x7b-instruct-v0.1",
@@ -99,71 +99,62 @@ Based on the given data above can you answer what is Money Market funds?" you mu
 }
 ```
 
+Remember if user question does not belong to any of the above or it is general question like greeting or welcome message chat and greet with him nicely and respond with strucutre below.
+
+```json
+{
+    "toolname": "Answer",
+    "input": "Nice to Meet you. How can I help you."
+
+}
+```
 
 Let's get started. The users query is as follows.
 """
 
-from sympy import *
-
-def interest_compound(capital=None,rate=None,period=None,debit=None) :
-    if capital is None:
-        return "Per calcolare il tasso di interesse è necessario inserire il capitale: "
-    if rate is None:
-        return "Il calcolo dell'interesse di basa su un tasso %, per favore digitalo per procedere col calcolo: "
-    if period is None:
-        return "Il calcolo dell'interesse dipende dalla durata del debito, digitalo per favore: "
-    if debit is None:
-        debit=0
-    #x = symbols("x")
-    try:
-        c,r = symbols("c,r", real=True)
-        n,d = symbols("n,d", integer=True)
-        n=period
-        c=capital
-        r=rate
-        d=debit
-        eq=0
-        if debit==0:
-          eq=c*(1+r*(n-d)/100) -c
-        else:
-          eq=d*c/(n)*(1+r*(n-d)/100) -c
-    except Exception as e:
-        print(e)
-    return eq
-
-
 
 import json
 
+
+
+
 def format_output(text: str):
-    # print(text)
-    if type(text)!= str:
-        text=str(text)
-    full_json_str= text.replace('\n', '').replace('\r', '').replace('\t', '').replace("  "," ")
-    if 'toolname' not in text:
-        full_json_str = '{"toolname": '+text
+    try:
+        # print(text)
+        if type(text)!= str:
+            text=str(text)
+        full_json_str= text.replace('\n', '').replace('\r', '').replace('\t', '').replace("  "," ")
+        if 'toolname' not in text:
+            full_json_str = '{"toolname": '+text
 
 
-    full_json_str = full_json_str.strip()
-    # print(full_json_str)
-    if "```json" in full_json_str:
-        full_json_str=full_json_str.split("```json")[1]
+        full_json_str = full_json_str.strip()
         # print(full_json_str)
-    if "```" in full_json_str:
-        full_json_str=full_json_str.split("```")[0]
+        if "```json" in full_json_str:
+            full_json_str=full_json_str.split("```json")[1]
+            # print(full_json_str)
+        if "```" in full_json_str:
+            full_json_str=full_json_str.split("```")[0]
+            # print(full_json_str)
+
+
         # print(full_json_str)
-
-
-    # print(full_json_str)
-    if full_json_str.endswith("```"):
-        full_json_str = full_json_str[:-3]
-    return json.loads(full_json_str)
+        if full_json_str.endswith("```"):
+            full_json_str = full_json_str[:-3]
+        return json.loads(full_json_str)
+    except Exception as e:
+        print("json error", e)
+        if "{" in text and "}" in text:
+            resp=extract_json_from_string(text)
+            if len(resp)>0:
+                return resp
+    return {}
 
 
 from duckduckgo_search import DDGS
 
 def use_tool(action: dict):
-    # print(action)
+    print(action)
     output=''
     toolname = action["toolname"]
     if toolname == "RAG":
