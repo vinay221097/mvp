@@ -144,13 +144,13 @@ def format_output(text: str):
 
 
     full_json_str = full_json_str.strip()
-    print(full_json_str)
+    # print(full_json_str)
     if "```json" in full_json_str:
         full_json_str=full_json_str.split("```json")[1]
-        print(full_json_str)
+        # print(full_json_str)
     if "```" in full_json_str:
         full_json_str=full_json_str.split("```")[0]
-        print(full_json_str)
+        # print(full_json_str)
 
 
     # print(full_json_str)
