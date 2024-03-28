@@ -182,8 +182,16 @@ def use_tool(action: dict):
 def run(query: str,system_prompt):
     res = generate_text(query,system_prompt)
     # print(res)
-    action_dict = format_output(res)
-    response = use_tool(action_dict)
+    try:
+        action_dict = format_output(res)
+        response = use_tool(action_dict)
+        return response
+    except:
+        if '{' in str(res) and '}' in str(res) and 'rtype' in str(res):
+            return res
+        else:
+            return {"rtype":"text","result":str(res)}
+
     # print(response)
 
     return response
