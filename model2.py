@@ -24,6 +24,28 @@ def generate_text(prompt_input,system_prompt):
     return output
 
 
+def get_math_answer(prompt_input):
+    output = replicate.run(
+    "mistralai/mixtral-8x7b-instruct-v0.1",
+    input={
+        "top_k": 50,
+        "top_p": 0.9,
+        "prompt": """<s>[INST] You are a brilliant math professor and your job is to understand the question and follow detailed steps and solve the answer to the problem provided to you. once you answer check back and evaluate if the answer is correct or not and then if needed recalculate it. once finished finally display the answer. If something is missing or needed request them back politely. [/INST]"""+f"""<s>[INST] {prompt_input} [/INST] """,
+        "temperature": 0.01,
+        "max_new_tokens": 1024,
+
+        "presence_penalty": 0,
+        "frequency_penalty": 0
+    }
+)
+    output ="".join(output)
+    # print(output)
+
+    return output
+
+
+
+
 def search_answer(question):
     search = DuckDuckGoSearchRun()
     res=""
@@ -49,8 +71,8 @@ sys_msg = """You are a helpful AI assistant, you are an agent capable of using a
 - Search: the search tool should be used whenever you need to find information. It can be used to find information about everything
 - Final Answer: the final answer tool must be used to respond to the user. You must use this when you have decided on an answer.
 - InterestCalculator: the InterestCalculator should be used whenever you need to calculate interest for given capital, rate and period, and debit. if any of the values are missing from the question use None value as parameters so we dont get any error. It uses python so make sure to write the Python code required to perform the  calculation required and make sure the Python returns your answer to the `output` variable.
-- RAG: The RAG is used whenever the user provided data along with the question and ask you answer about the question using above data.  
--
+- RAG: The RAG is used whenever the user provided data along with the question and ask you answer about the question using above data. It uses Python so make sure to write complete Python code required to perform the calculation required and make sure the Python returns your answer to the `output` variable.  
+- Math: If user asks questions related to math provided some epressions or equations and any other math stuff except the calculate interest then you use this tool to answer 
 If you think that particular tool can be used but are missing any information for a particular tool ask the missing information from the user and then use the tool. 
 To use these tools you must always respond in JSON format containing `"toolname"` and `"input"` key-value pairs.
  For example, to answer the question, "What is the stock price of symbol CCL for since seven days?" you must use the Stocker tool like so:
@@ -86,6 +108,25 @@ Or to answer the question "who is the current president of the USA?" you must re
     "input": "current president of USA"
 }
 ```
+
+Or to answer the question "evaluate x+3+2x when x is 1" you must respond:
+
+```json
+{
+    "toolname": "Math",
+    "input": "evaluate x+3+2x when x is 1"
+}
+```
+
+Or to answer the question "x^2+x-2" you must respond:
+
+```json
+{
+    "toolname": "Math",
+    "input": "x^2+x-2"
+}
+```
+
 
 Or to answer the question thats related to finance provided some data then you use this tool answer that question using the data
 example provided "Money market funds invest in short-term debt securities and provide interest income with very low risk of changes in share value. Fund NAVs are typically set to one currency unit, but there have been instances over recent years in which the NAV of some funds declined when the securities they held dropped dramatically in value. Funds are differentiated by the types of money market securities they purchase and their average maturities.
@@ -169,6 +210,9 @@ def use_tool(action: dict):
         return {"rtype":"image","result":f"{local_vars['output']}"}
     elif toolname == "Search":
         res=search_answer(action["input"])
+        return {"rtype":"text","result": res}
+    elif toolname=='Math':
+        res=get_math_answer(action["input"])
         return {"rtype":"text","result": res}
     else:
         # otherwise just assume final answer

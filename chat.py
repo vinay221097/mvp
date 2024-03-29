@@ -41,6 +41,7 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          so now your job is tell if the user is asking a question related to this information you have or something else.
                          Also if the user is asking about something like calculate interest and provided some values then also i suggest you return False to such questions.
                          Remember when user is asking info about specific stock info provided symbol and timeperiod you do not have that info we have seperate function for it. you only have info about general information on background of finance.
+                         Also if user is asking some questions related to math and asking to solve you do not have that info as well. so repond with provided structure with result false
                          You must respond only the json strucutre output in format provided below and nothing else. Do not answer Beyond the strucutre provided to you as examples.
 
                          example if user asks a question like "what is capital of france?" you must respond with json output:
@@ -68,6 +69,15 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          "result": "false"
                          }
                          ```
+                         but if user asks a question about some math like "evaluate x+3+2x when x is 1" or any math related  something like you must respond like this:
+
+                        ```json
+                         {
+                         "toolname":"Check",
+                         "result": "false"
+                         }
+                         ```
+
 
                          but if user asks a question about information about a stock and asking info about it  like "What is the stock price of symbol CCL from jan 2023 to may 2023" something like you must respond like this:
 
