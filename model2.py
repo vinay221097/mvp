@@ -70,7 +70,7 @@ def search_answer(question):
                 # print(response_json[i])
                 full_results+=response_json[i]["description"] 
 
-            systemp_prompt="You are a brilliant assistant and help in answering questions for the user."
+            system_prompt="You are a brilliant assistant and help in answering questions for the user."
             prompt_input=f"""Data:{full_results}
                             Based on the given data above can you answer {question}"""
 
