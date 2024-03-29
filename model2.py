@@ -4,6 +4,11 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 import re,json
+from crawlbase import CrawlingAPI, ScraperAPI, LeadsAPI, ScreenshotsAPI, StorageAPI
+from crawlbase import CrawlingAPI
+import json
+
+
 def generate_text(prompt_input,system_prompt):
     output = replicate.run(
     "mistralai/mixtral-8x7b-instruct-v0.1",
@@ -47,15 +52,36 @@ def get_math_answer(prompt_input):
 
 
 def search_answer(question):
-    search = DuckDuckGoSearchRun()
+    api = CrawlingAPI({ 'token': 'rkcSMegJId6B-Wx6R9WNCw' })
+    google_search_url = 'https://www.google.com/search?q='+question
+    # options for Crawling API
+    options = {
+    'scraper': 'google-serp'
+    }
     res=""
     try:
-        res=search.run(question)
+        response = api.get(google_search_url, options)
+        if response['status_code'] == 200 and response['headers']['pc_status'] == '200':
+            response_json = json.loads(response['body'].decode('latin1'))
+            response_json=response_json["body"]["searchResults"]
+            # print(response_json)
+            full_results=""
+            for i in range (min(len(response_json),4)):
+                # print(response_json[i])
+                full_results+=response_json[i]["description"] 
+
+            systemp_prompt="You are a brilliant assistant and help in answering questions for the user."
+            prompt_input=f"""Data:{full_results}
+                            Based on the given data above can you answer {question}"""
+
+            res= generate_text(prompt_input,system_prompt)
     except Exception as e:
         print("Exception",e)
-        res="Sorry answer not found due to some error"
-    print(res)
+        res="Sorry answer not found due to some internal error"
     return res
+
+
+
 
 
 
