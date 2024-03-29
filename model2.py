@@ -31,7 +31,7 @@ def get_math_answer(prompt_input):
         "top_k": 50,
         "top_p": 0.9,
         "prompt": """<s>[INST] You are a brilliant math professor and your job is to understand the question and follow detailed steps and solve the answer to the problem provided to you. once you answer check back and evaluate if the answer is correct or not and then if needed recalculate it. once finished finally display the answer. If something is missing or needed request them back politely. [/INST]"""+f"""<s>[INST] {prompt_input} [/INST] """,
-        "temperature": 0.01,
+        "temperature": 0.7,
         "max_new_tokens": 1024,
 
         "presence_penalty": 0,
