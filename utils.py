@@ -2,6 +2,7 @@ from sympy import *
 import yfinance as yf
 import dateparser
 import pandas as pd
+
 import io
 import matplotlib.pyplot as plt
 import base64
@@ -9,7 +10,30 @@ import matplotlib
 import re
 import json
 import datetime as DT;
+import sqlite3
 matplotlib.use('Agg')
+
+
+
+def get_user_info(email):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor = conn.execute('SELECT * FROM user_info WHERE email = ?', (email,))
+    row = cursor.fetchone()
+    if row:
+        # Extract column names from the cursor description
+        columns = [column[0] for column in cursor.description]
+        # Create a dictionary where keys are column names and values are row values
+        user_info_dict = dict(zip(columns, row))
+    else:
+        user_info_dict = {}
+
+    conn.close()
+    print(user_info_dict)
+    return user_info_dict
+
+
+
 
 def interest_compound(capital=None,rate=None,period=None,debit=None) :
     if capital is None:

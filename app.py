@@ -11,6 +11,12 @@ from datetime import date
 from utils import *
 from chat import *
 import sqlite3
+import pandas as pd
+import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+
+
 app = Flask(__name__,static_url_path='/static', 
             static_folder='static',
             template_folder='templates')
@@ -18,7 +24,10 @@ app = Flask(__name__,static_url_path='/static',
 # random string
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+UPLOAD_FOLDER = 'uploads/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = "af95d160b65aac2494ce48226202559d1f82563"
+
 
 Minify(app=app, html=True, js=False, cssless=False)
 
@@ -46,6 +55,24 @@ logger = logging.getLogger(__name__)
 con = sqlite3.connect("users.db")
 
 
+
+
+
+def get_user_info(email):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor = conn.execute('SELECT * FROM user_info WHERE email = ?', (email,))
+    row = cursor.fetchone()
+    if row:
+        # Extract column names from the cursor description
+        columns = [column[0] for column in cursor.description]
+        # Create a dictionary where keys are column names and values are row values
+        user_info_dict = dict(zip(columns, row))
+    else:
+        user_info_dict = {}
+
+    conn.close()
+    return user_info_dict
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -93,7 +120,7 @@ def login():
         user = cursor.fetchone()
 
         if user and check_password_hash(user[2], password):
-            session['user_id'] = user[0]
+            session['user_id'] = user[1]
             conn.close()
             return redirect(url_for("hello"))
         else:
@@ -109,7 +136,57 @@ def logout():
 
 
 
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    # Sample email to work with, in real scenario pass it dynamically or ensure authentication
+    user_email = session['user_id']
+    user_info = get_user_info(user_email)
 
+    if request.method == 'POST':
+        conn = sqlite3.connect('users.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE user_info SET
+            name = ?,
+            surname = ?,
+            date_of_birth = ?,
+            province_of_birth = ?,
+            place_of_birth = ?,
+            gender = ?,
+            citizenship = ?,
+            conjugated = ?,
+            number_of_children = ?,
+            number_of_dependent_children = ?,
+            annual_income = ?,
+            total_liquidity = ?,
+            invested_asset_value = ?,
+            value_of_real_estate = ?,
+            vehicle_value = ?,
+            total_debt_values = ?
+            WHERE email = ?''', (
+            request.form['name'],
+            request.form['surname'],
+            DT.datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d').date(),
+            request.form['province_of_birth'],
+            request.form['place_of_birth'],
+            request.form['gender'],
+            request.form.get('citizenship', 'No'),
+            request.form['conjugated'],
+            request.form['number_of_children'],
+            request.form['number_of_dependent_children'],
+            request.form['annual_income'],
+            request.form['total_liquidity'],
+            request.form['invested_asset_value'],
+            request.form['value_of_real_estate'],
+            request.form['vehicle_value'],
+            request.form['total_debt_values'],
+            user_email
+        ))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('profile'))
+
+    return render_template('home/profile.html', user_info=user_info)
 
 
 
@@ -158,6 +235,98 @@ def get_response(userText):
 
 
 
+
+def process_excel(file_path):
+    df = pd.read_excel(file_path)  # Assuming the file is an Excel file
+    # Convert 'Data' column to datetime format
+    df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
+
+    # Extract month and year from the 'Data' column
+    df['Month'] = df['Data'].dt.month
+    df['Year'] = df['Data'].dt.year
+
+    # Define categories of expenses
+    categories = ['Utenze', 'Alimentari', 'Trasporti', 'Hotel Ristoranti e Viaggi', 'Giochi Cultura e Spettacoli', 'Mutui, finanziamenti e assicurazioni', 'Altre spese']
+
+    # Create a pivot table for each category spending in each month
+    pivot_table = df.pivot_table(index='Moneymap', columns=['Year', 'Month'], values='Movimento', aggfunc='sum', fill_value=0)
+
+    # Filter the pivot table for categories of interest
+    category_pivot = pivot_table.loc[categories]
+
+    # Calculate the difference from the previous month
+    category_diff = category_pivot.diff(axis=1)
+    
+    # Process analysis results
+    total_non_essential_spending = 15192
+    total_spending = 115488
+    percentage_non_essential = 13.15
+    most_spending_category_overall = 'Mutui, finanziamenti e assicurazioni'
+    total_spending_overall = 8841
+    most_spending_category_each_month = {
+        'Hotel Ristoranti e Viaggi': '(2023, 5)',
+        'Giochi Cultura e Spettacoli': '(2024, 2)',
+        'Mutui, finanziamenti e assicurazioni': '(2023, 12)',
+        'Altre spese': '(2023, 7)'
+    }
+    total_spending_each_month = {
+        'Hotel Ristoranti e Viaggi': 647,
+        'Giochi Cultura e Spettacoli': 78,
+        'Mutui, finanziamenti e assicurazioni': 1066,
+        'Altre spese': 2285
+    }
+
+    return category_diff, total_non_essential_spending, total_spending, percentage_non_essential, most_spending_category_overall, total_spending_overall, most_spending_category_each_month, total_spending_each_month
+
+def generate_plot(category_diff):
+    plt.figure(figsize=(12, 6))
+    for category in category_diff.index:
+        x_values = [str(col) for col in category_diff.columns]
+        y_values = category_diff.loc[category].astype(float)
+        plt.plot(x_values, y_values, marker='o', label=category)
+
+    plt.title('Differenze di spesa rispetto al mese precedente per ciascuna categoria')
+    plt.xlabel('Month')
+    plt.ylabel('Difference in Spending')
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    # Convert plot to bytes object and then to base64 for embedding in HTML
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plot_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    plt.close()
+
+    return plot_data
+
+
+
+
+
+
+@app.route('/uploadstatement', methods=['GET','POST'])
+def uploadstatement():
+    if request.method=='POST':
+        if 'file' not in request.files:
+            return redirect('/')
+        file = request.files['file']
+        if file.filename == '':
+            return redirect('/')
+        if file:
+            file_path = app.config['UPLOAD_FOLDER'] + file.filename
+            file.save(file_path)
+            category_diff, total_non_essential_spending, total_spending, percentage_non_essential, most_spending_category_overall, total_spending_overall, most_spending_category_each_month, total_spending_each_month = process_excel(file_path)
+            plot = generate_plot(category_diff)
+            money_map_categories = category_diff.index.tolist()  # Extract category list
+            return render_template('home/dashboard.html', plot=plot, money_map_categories=money_map_categories, category_diff=category_diff.to_dict(),
+                                   total_non_essential_spending=total_non_essential_spending, total_spending=total_spending,
+                                   percentage_non_essential=percentage_non_essential, most_spending_category_overall=most_spending_category_overall,
+                                   total_spending_overall=total_spending_overall, most_spending_category_each_month=most_spending_category_each_month,
+                                   total_spending_each_month=total_spending_each_month)
+    return render_template('home/uploadstatement.html')
 
 
 

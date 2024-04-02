@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risultato</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        h1 {
+            margin-bottom: 0;
+            /* Rimuovi il margine inferiore per l'elemento h1 */
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            /* Consenti agli elementi di passare alla riga successiva */
+            justify-content: center;
+            /* Centra il contenuto orizzontalmente */
+        }
+
+        .chart-table-container {
+            flex-basis: 100%;
+            /* Il contenitore del grafico e della tabella occupa tutta la larghezza */
+            display: flex;
+            justify-content: space-between;
+            /* Spaziatura tra grafico e tabella */
+            margin-bottom: 0px;
+        }
+
+        .chart-container {
+            flex-grow: 1;
+            /* Il contenitore del grafico occupa tutto lo spazio extra */
+            box-sizing: border-box;
+            /* Assicura che il padding sia incluso nel calcolo della larghezza */
+        }
+
+        .table-container {
+            flex-basis: 48%;
+            /* Il contenitore della tabella occupa quasi la metà della larghezza disponibile */
+            box-sizing: border-box;
+            /* Assicura che il padding sia incluso nel calcolo della larghezza */
+        }
+
+        .analysis-container {
+            flex-basis: 100%;
+            /* Il contenitore dei risultati dell'analisi occupa tutta la larghezza */
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .analysis-container h2 {
+            margin-top: 0;
+            text-align: center;
+            /* Centra l'intestazione */
+        }
+
+        .analysis-result {
+            margin-bottom: 0px;
+            text-align: center;
+            /* Centra il contenuto */
+        }
+
+        .analysis-result p {
+            margin: 5px 0;
+        }
+
+        .box-container {
+            display: flex;
+            justify-content: center;
+            /* Centra gli elementi orizzontalmente */
+            margin-bottom: 20px;
+        }
+
+        .box {
+            background-color: #f9f9f9;
+            /* Colore di sfondo chiaro */
+            border: 1px solid #dddddd;
+            padding: 10px;
+            margin-right: 10px;
+            border-radius: 10px;
+            /* Angoli arrotondati */
+            flex: 1;
+            /* Distribuisci lo spazio rimanente in modo uniforme */
+            min-width: 200px;
+            /* Larghezza minima per le caselle */
+        }
+
+        /* CSS aggiuntivo per formattare il contenuto all'interno delle caselle */
+        .box span {
+            font-weight: normal;
+            /* Reset del grassetto */
+        }
+
+        .box .result {
+            font-weight: bold;
+            /* Incremento del grassetto per i risultati */
+        }
+
+        .box p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Rapporto di Analisi delle Spese</h1>
+
+    <div class="container">
+        <div class="chart-table-container">
+            <div class="chart-container">
+                <h2>Grafico</h2>
+                <div>
+                    <img src="data:image/png;base64,{{ plot }}" alt="Grafico">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h2>Tabella</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Categorie</th>
+                            {% for column in money_map_categories %}
+                            <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for category, data in category_diff.items() %}
+                            {% if not loop.first %}
+                                <tr>
+                                    <td>{{ category }}</td>
+                                    {% for value in data %}
+                                        <td>{{ data[value] }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="analysis-container">
+            <h2>Risultati dell'Analisi</h2>
+
+            <div class="analysis-result">
+                <div class="box-container">
+                    <div class="box" style="background-color: #dd55a9;">
+                        <p>Spese Totali Non Essenziali:<br><span>€</span> <span class="result">{{
+                                total_non_essential_spending }}</span></p>
+                    </div>
+                    <div class="box" style="background-color: #54e49c;">
+                        <p>Spese Totali:<br><span>€</span> <span class="result">{{ total_spending }}</span></p>
+                    </div>
+                    <div class="box" style="background-color: #75c8dd;">
+                        <p>Percentuale di Spese Non Essenziali:<br><span class="result">{{ percentage_non_essential }}%</span></p>
+                    </div>
+                    <div class="box" style="background-color: #b9eb45;">
+                        <p>Categorie più spese non essenziali:<br><span class="result">{{ most_spending_category_overall }}</span>
+                        </p>
+                    </div>
+                </div>
+                <p>Categoria più spesa non essenziale per ogni mese:</p>
+                <pre>{{ most_spending_category_each_month }}</pre>
+                <p>Spese totali per ogni mese per la categoria più spesa non essenziale:</p>
+                <pre>{{ total_spending_each_month }}</pre>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

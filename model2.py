@@ -7,10 +7,12 @@ import re,json
 from crawlbase import CrawlingAPI, ScraperAPI, LeadsAPI, ScreenshotsAPI, StorageAPI
 from crawlbase import CrawlingAPI
 import json
+from flask import session
 import datetime as DT;
 
 
 def generate_text(prompt_input,system_prompt):
+    print("prompt",prompt_input)
     output = replicate.run(
     "mistralai/mixtral-8x7b-instruct-v0.1",
     input={
@@ -99,6 +101,7 @@ sys_msg = """You are a helpful AI assistant, you are an agent capable of using a
 - Final Answer: the final answer tool must be used to respond to the user. You must use this when you have decided on an answer.
 - InterestCalculator: the InterestCalculator should be used whenever you need to calculate interest for given capital, rate and period, and debit. if any of the values are missing from the question use None value as parameters so we dont get any error. It uses python so make sure to write the Python code required to perform the  calculation required and make sure the Python returns your answer to the `output` variable.
 - RAG: The RAG is used whenever the user provided data along with the question and ask you answer about the question using above data. It uses Python so make sure to write complete Python code required to perform the calculation required and make sure the Python returns your answer to the `output` variable.  
+- ProfileInfo: The PrfoileInfo should be used when you feel like user is asking questions that related to his info or to answer the question user info is needed then you have to use this tool. It uses Python so make sure to write complete Python code required to perform the calculation required and make sure the Python returns your answer to the `output` variable.
 - Math: If user asks questions related to math provided some epressions or equations and any other math stuff except the calculate interest then you use this tool to answer 
 If you think that particular tool can be used but are missing any information for a particular tool ask the missing information from the user and then use the tool. 
 To use these tools you must always respond in JSON format containing `"toolname"` and `"input"` key-value pairs.
@@ -126,6 +129,25 @@ or to answer "what is the interest for capital of 5000 euro for rate of 3%  for 
     "input":"output=interest_compound(capital=5000,rate=3,period=4,debit=2)"
 }
 ```
+
+or to answer "What is my balance from last year?" you should use ProfileInfo tool like below:
+```json
+{
+    "toolname":"ProfileInfo",
+    "input":"What is my balance from last year?"
+
+}
+
+
+or to answer "Can you show me how much I have saved on a personal level over the last year so I can understand how much I can invest?" you should use ProfileInfo tool like below:
+```json
+{
+    "toolname":"ProfileInfo",
+    "input":"Can you show me how much I have saved on a personal level over the last year so I can understand how much I can invest?"
+
+}
+
+
 
 Or to answer the question "who is the current president of the USA?" you must respond:
 
@@ -243,6 +265,13 @@ def use_tool(action: dict):
         local_vars = {}
         exec(fcall, globals(), local_vars)
         return {"rtype":"image","result":f"{local_vars['output']}"}
+    elif toolname=="ProfileInfo":
+        user_data= str(get_user_info(session['user_id']))
+        prompt_input="""based on the data provided related to the user answer the user question
+                         Data: """+user_data+f"Question: {action['input']}"
+        system_prompt="You are a brilliant assistant and help in answering questions for the user."
+        res= generate_text(prompt_input,system_prompt)
+        return {"rtype":"text","result": res}
     elif toolname == "Search":
         res=search_answer(action["input"])
         return {"rtype":"text","result": res}

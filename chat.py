@@ -95,15 +95,15 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          "result": "false"
                          }
                          ```
+                         but if user asks a question about information about a question that related to or that need the user informations "Can you show me how much I have saved personally over the last year so I can understand how much I can invest?" something like you must respond like this:
+
+                        ```json
+                         {
+                         "toolname":"Check",
+                         "result": "false"
+                         }
+                         ```
 """
-
-
-
-
-
-
-
-
 
 
 
