@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Update Profile</title>
+    <title>Aggiorna Profilo</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -20,7 +20,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
         }
         form {
             display: flex;
@@ -50,73 +50,82 @@
     </style>
 </head>
 <body>
-
 <div class="form-container">
-        <h2 style="text-align: center;">Profile</h2>
+    <a style="float:right;color: #fff;margin: 5px;text-decoration: none;font-weight: bolder;padding: 4px;background: #6c757d;" href="/logout">
+    Logout
+    </a>
+        <a style="float:right;color: #fff;margin: 5px;text-decoration: none;font-weight: bolder;padding: 4px;background: #6c757d;" href="/results">
+    Dashboard
+    </a>
+    <a style="float:right;color: #fff;margin: 5px;text-decoration: none;font-weight: bolder;padding: 4px;background: #6c757d;" href="{{url_for('hello')}}">
+    Home
+    </a>
+    <h2 style="text-align:center;">Profilo</h2>
     {% if user_info %}
     <form action="/profile" method="post">
-        <label for="name">Name:</label>
+        <label for="name">Nome:</label>
         <input type="text" id="name" name="name" value="{{ user_info['name'] }}" required>
         
-        <label for="surname">Surname:</label>
+        <label for="surname">Cognome:</label>
         <input type="text" id="surname" name="surname" value="{{ user_info['surname'] }}" required>
         
-        <label for="date_of_birth">Date of Birth:</label>
+        <label for="date_of_birth">Data di Nascita:</label>
         <input type="date" id="date_of_birth" name="date_of_birth" value="{{ user_info['date_of_birth'] }}" required>
         
-        <label for="province_of_birth">Province of Birth:</label>
+        <label for="province_of_birth">Provincia di Nascita:</label>
         <select id="province_of_birth" name="province_of_birth" required>
             <option value="MI" {% if user_info['province_of_birth'] == 'MI' %} selected {% endif %}>MI</option>
-            <!-- Add more options here -->
+            <!-- Aggiungi altre opzioni qui -->
         </select>
         
-        <label for="place_of_birth">Place of Birth:</label>
+        <label for="place_of_birth">Luogo di Nascita:</label>
         <input type="text" id="place_of_birth" name="place_of_birth" value="{{ user_info['place_of_birth'] }}" required>
         
-        <label for="gender">Gender:</label>
+        <label for="gender">Genere:</label>
         <select id="gender" name="gender" required>
-            <option value="Male" {% if user_info['gender'] == 'Male' %} selected {% endif %}>Male</option>
-            <option value="Female" {% if user_info['gender'] == 'Female' %} selected {% endif %}>Female</option>
-            <option value="Not Specified" {% if user_info['gender'] == 'Not Specified' %} selected {% endif %}>Not Specified</option>
+            <option value="Male" {% if user_info['gender'] == 'Male' %} selected {% endif %}>Maschio</option>
+            <option value="Female" {% if user_info['gender'] == 'Female' %} selected {% endif %}>Femmina</option>
+            <option value="Not Specified" {% if user_info['gender'] == 'Not Specified' %} selected {% endif %}>Non Specificato</option>
         </select>
+        <div style="display:flex">
+        <label for="citizenship">Cittadinanza Italiana:</label>
+        <input style="margin:4px" type="checkbox" id="citizenship" name="citizenship" {% if user_info['citizenship'] == 'Yes' %} checked {% endif %}>
+        </div>
         
-        <label for="citizenship">Italian Citizenship:</label>
-        <input type="checkbox" id="citizenship" name="citizenship" {% if user_info['citizenship'] == 'Yes' %} checked {% endif %}>
-        
-        <label for="conjugated">Conjugated:</label>
+        <label for="conjugated">Coniugato/a:</label>
         <select id="conjugated" name="conjugated" required>
-            <option value="YES" {% if user_info['conjugated'] == 'YES' %} selected {% endif %}>YES</option>
+            <option value="YES" {% if user_info['conjugated'] == 'YES' %} selected {% endif %}>SÌ</option>
             <option value="NO" {% if user_info['conjugated'] == 'NO' %} selected {% endif %}>NO</option>
         </select>
         
-        <label for="number_of_children">Number of Children:</label>
+        <label for="number_of_children">Numero di Figli:</label>
         <input type="number" id="number_of_children" name="number_of_children" value="{{ user_info['number_of_children'] }}" min="0" required>
         
-        <label for="number_of_dependent_children">Number of Dependent Children:</label>
+        <label for="number_of_dependent_children">Numero di Figli a Carico:</label>
         <input type="number" id="number_of_dependent_children" name="number_of_dependent_children" value="{{ user_info['number_of_dependent_children'] }}" min="0" max="{{ user_info['number_of_children'] }}" required>
         
-        <label for="annual_income">Annual Income:</label>
+        <label for="annual_income">Reddito Annuale:</label>
         <input type="number" step="0.01" id="annual_income" name="annual_income" value="{{ user_info['annual_income'] }}" required>
         
-        <label for="total_liquidity">Total Liquidity:</label>
+        <label for="total_liquidity">Liquidità Totale:</label>
         <input type="number" step="0.01" id="total_liquidity" name="total_liquidity" value="{{ user_info['total_liquidity'] }}" required>
         
-        <label for="invested_asset_value">Invested Asset Value:</label>
+        <label for="invested_asset_value">Valore degli Asset Investiti:</label>
         <input type="number" step="0.01" id="invested_asset_value" name="invested_asset_value" value="{{ user_info['invested_asset_value'] }}" required>
         
-        <label for="value_of_real_estate">Value of Real Estate:</label>
+        <label for="value_of_real_estate">Valore Immobiliare:</label>
         <input type="number" step="0.01" id="value_of_real_estate" name="value_of_real_estate" value="{{ user_info['value_of_real_estate'] }}" required>
         
-        <label for="vehicle_value">Vehicle Value:</label>
+        <label for="vehicle_value">Valore del Veicolo:</label>
         <input type="number" step="0.01" id="vehicle_value" name="vehicle_value" value="{{ user_info['vehicle_value'] }}" required>
         
-        <label for="total_debt_values">Total Debt Values:</label>
+        <label for="total_debt_values">Valore Totale Dei Debiti:</label>
         <input type="number" step="0.01" id="total_debt_values" name="total_debt_values" value="{{ user_info['total_debt_values'] }}" required>
         
-        <input type="submit" value="Update Profile">
+        <input type="submit" value="Aggiorna Profilo">
     </form>
     {% else %}
-    <p>User information not found.</p>
+    <p>Informazioni utente non trovate.</p>
     {% endif %}
 </div>
 </body>

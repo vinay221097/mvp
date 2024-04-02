@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Risultato</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home/dashboard.css') }}">
     <style>
         h1 {
             margin-bottom: 0;
@@ -125,7 +125,17 @@
 </head>
 
 <body>
+
     <h1>Rapporto di Analisi delle Spese</h1>
+        <a style="float:right;color: #fff;margin: 5px;text-decoration: none;font-weight: bolder;padding: 4px;background: #6c757d;" href="/logout">
+        Logout
+    </a>
+    <a style="float:right;color: #fff;margin: 5px;text-decoration: none;font-weight: bolder;padding: 4px;background: #6c757d;" href="/uploadstatement">
+        Update
+    </a>
+    <a style="float:right;color: #fff;margin: 5px;text-decoration: none;font-weight: bolder;padding: 4px;background: #6c757d;" href="{{url_for('hello')}}">
+        Home
+    </a>
 
     <div class="container">
         <div class="chart-table-container">

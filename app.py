@@ -304,11 +304,17 @@ def generate_plot(category_diff):
 
 
 
-
-
-
-@app.route('/uploadstatement', methods=['GET','POST'])
+@app.route('/uploadstatement', methods=['GET'])
 def uploadstatement():
+    return render_template('home/uploadstatement.html')
+
+
+@app.route('/results', methods=['GET','POST'])
+def results():
+    files=os.listdir(app.config['UPLOAD_FOLDER'])
+    # Filter out only .xlsx files
+    xlsx_files = [file for file in files if file.endswith('.xlsx')]
+    file_path= xlsx_files[0]
     if request.method=='POST':
         if 'file' not in request.files:
             return redirect('/')
@@ -318,15 +324,16 @@ def uploadstatement():
         if file:
             file_path = app.config['UPLOAD_FOLDER'] + file.filename
             file.save(file_path)
-            category_diff, total_non_essential_spending, total_spending, percentage_non_essential, most_spending_category_overall, total_spending_overall, most_spending_category_each_month, total_spending_each_month = process_excel(file_path)
-            plot = generate_plot(category_diff)
-            money_map_categories = category_diff.index.tolist()  # Extract category list
-            return render_template('home/dashboard.html', plot=plot, money_map_categories=money_map_categories, category_diff=category_diff.to_dict(),
-                                   total_non_essential_spending=total_non_essential_spending, total_spending=total_spending,
-                                   percentage_non_essential=percentage_non_essential, most_spending_category_overall=most_spending_category_overall,
-                                   total_spending_overall=total_spending_overall, most_spending_category_each_month=most_spending_category_each_month,
-                                   total_spending_each_month=total_spending_each_month)
-    return render_template('home/uploadstatement.html')
+
+    category_diff, total_non_essential_spending, total_spending, percentage_non_essential, most_spending_category_overall, total_spending_overall, most_spending_category_each_month, total_spending_each_month = process_excel(file_path)
+    plot = generate_plot(category_diff)
+    money_map_categories = category_diff.index.tolist()  # Extract category list
+    return render_template('home/dashboard.html', plot=plot, money_map_categories=money_map_categories, category_diff=category_diff.to_dict(),
+                           total_non_essential_spending=total_non_essential_spending, total_spending=total_spending,
+                           percentage_non_essential=percentage_non_essential, most_spending_category_overall=most_spending_category_overall,
+                           total_spending_overall=total_spending_overall, most_spending_category_each_month=most_spending_category_each_month,
+                           total_spending_each_month=total_spending_each_month)
+    
 
 
 
