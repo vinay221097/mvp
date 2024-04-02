@@ -7,6 +7,7 @@ import re,json
 from crawlbase import CrawlingAPI, ScraperAPI, LeadsAPI, ScreenshotsAPI, StorageAPI
 from crawlbase import CrawlingAPI
 import json
+import datetime as DT;
 
 
 def generate_text(prompt_input,system_prompt):
@@ -106,14 +107,14 @@ To use these tools you must always respond in JSON format containing `"toolname"
 ```json
 {
     "toolname": "Stocker",
-    "input": "import datetime as DT;output=get_stock_data(ticker='CCL', start_date=DT.date.today()+DT.timedelta(days=-7),end_date=None)"
+    "input": "output=get_stock_data(ticker='CCL', start_date=DT.date.today()+DT.timedelta(days=-7),end_date=None)"
 }
 ```
 or to answer a question like "What is the stock price of symbol CCL from jan 2023 to may 2023?" you must use the Stocker tool like so:
 ```json
 {
     "toolname": "Stocker",
-    "input": "import datetime as DT;output=get_stock_data(ticker='CCL', start_date='2023-01-01',end_date='2023-05-31')"
+    "input": "output=get_stock_data(ticker='CCL', start_date='2023-01-01',end_date='2023-05-31')"
 }
 ```
 
@@ -218,6 +219,13 @@ def format_output(text: str):
     return {}
 
 
+
+
+
+
+
+
+
 from duckduckgo_search import DDGS
 
 def use_tool(action: dict):
@@ -231,8 +239,9 @@ def use_tool(action: dict):
         exec(action["input"], globals(), local_vars)
         return {"rtype":"text","result":f"Tool Interest: {local_vars['output']}"}
     elif toolname == "Stocker":
+        fcall= get_stock_call(action["input"])
         local_vars = {}
-        exec(action["input"], globals(), local_vars)
+        exec(fcall, globals(), local_vars)
         return {"rtype":"image","result":f"{local_vars['output']}"}
     elif toolname == "Search":
         res=search_answer(action["input"])

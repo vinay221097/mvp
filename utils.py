@@ -8,6 +8,7 @@ import base64
 import matplotlib
 import re
 import json
+import datetime as DT;
 matplotlib.use('Agg')
 
 def interest_compound(capital=None,rate=None,period=None,debit=None) :
@@ -81,7 +82,9 @@ def get_stock_data(ticker, start_date, end_date=None):
     stock_data['Close'].plot(title=f'{ticker} Stock Closing Prices')
     plt.xlabel('Date')
     plt.ylabel('Close Price (USD)')
+    # plt.show()
     plt.savefig(buf, format='png')
+    
     plt.close()
     buf.seek(0)
     
@@ -93,4 +96,31 @@ def get_stock_data(ticker, start_date, end_date=None):
 
 
 
+def get_stock_call(input_string:str):
+    # Find the start index of 'get_stock_data'
+    start_index = input_string.find('get_stock_data')
 
+    # Ensure 'get_stock_data' is in the string
+    if start_index != -1:
+        # Find the index of the opening parenthesis of the 'get_stock_data' function call
+        start_parenthesis_index = input_string.find('(', start_index)
+        
+        # Start counting from the first opening parenthesis
+        open_parentheses_count = 1  # Start with 1 to account for the first opening parenthesis
+        end_index = start_parenthesis_index + 1
+        
+        # Iterate over the string starting after the '(' of 'get_stock_data'
+        while end_index < len(input_string) and open_parentheses_count > 0:
+            if input_string[end_index] == '(':
+                open_parentheses_count += 1
+            elif input_string[end_index] == ')':
+                open_parentheses_count -= 1
+            end_index += 1
+        
+        # The end_index will be one past the closing ')' of the function call, so we don't need to adjust it
+        
+        # Extract the complete function call
+        specific_call = input_string[start_index:end_index]
+        return f"output={specific_call}"
+    else:
+        return input_string
