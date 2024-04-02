@@ -211,6 +211,11 @@ import json
 def format_output(text: str):
     try:
         # print(text)
+        if "{" in text and "}" in text:
+            resp=extract_json_from_string(text)
+            if len(resp)>0:
+                return resp
+        
         if type(text)!= str:
             text=str(text)
         full_json_str= text.replace('\n', '').replace('\r', '').replace('\t', '').replace("  "," ")
