@@ -43,8 +43,15 @@ check_finance_prompt ="""You are a helpful Financial assistant and  has a decade
                          Remember when user is asking info about specific stock info provided symbol and timeperiod you do not have that info we have seperate function for it. you only have info about general information on background of finance.
                          Also if user is asking some questions related to math and asking to solve you do not have that info as well. so repond with provided structure with result false
                          You must respond only the json strucutre output in format provided below and nothing else. Do not answer Beyond the strucutre provided to you as examples.
+                         if user is greeting you then just respond
+                         ```json
+                         {
+                         "toolname":"Check",
+                         "result": "false"
+                         }
+                         ```
 
-                         example if user asks a question like "what is capital of france?" you must respond with json output:
+                         or if user asks a question like "what is capital of france?" you must respond with json output:
                          ```json
                          {
                          "toolname":"Check",
@@ -112,7 +119,7 @@ def get_answer_with_ai_public(query):
     query=entranslator.translate(query)
 
     res = generate_text(query,check_finance_prompt)
-    # print(res)
+    print(res)
     action_dict = format_output(res)
     if action_dict['result']=="true":
         docs = db.similarity_search(query,k=3)
