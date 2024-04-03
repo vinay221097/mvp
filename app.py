@@ -201,6 +201,20 @@ name = 'Finn'
 role = 'Assistant'
 
 
+def hardcode(message):
+    if "btp" in message:
+        return """Riusciresti a dirmi qual è il tuo prezzo medio di carico? In caso negativo. il titolo nella giornata di ieri, 28 marzo 2024, ha chiuso ad un prezzo di 106,05€, questo significa che se l’avessi comprato al prezzo minimo del 5 ottobre 2023, pari a 96,85€ il capital gain alla chiusura di ieri sarebbe del 9,912%, mentre se fosse al prezzo massimo pari a 97,45€ massimo il capital gain sarebbe del 9,236%. 
+                Inoltre, per calcolare il tuo guadagno è necessario tenere in considerazione anche il rateo maturato dalla data di acquisto, pari a 180 giorni al tasso di interesse dell’obbligazione pari a 4,40%.
+                Per calcolare con esattezza il tuo guadagno riusciresti a dirmi il prezzo medio di carico che quantità hai acquisito? """
+    elif "carico" in message:
+        return "Ad un prezzo medio di carico di 97€, il capital gain teorico è pari a 9,742%, mentre il rateo maturato è pari a 297,21€."
+    elif "risparmi" in message:
+        return "Analizzando il tuo profilo di rischio e i tuoi obiettivi, ed ipotizzando un risparmio per l’anno futuro in linea con quello passato e pari a 5mila euro, allora ti suggerirei di investire in un piano di accumulo con un orizzonte temporale di 5-7 anni, in modo da sfruttare il cost average, investendo inizialmente una cifra di 2000€ e versando mensilmente circa 200 euro. La restante parte del risparmio in obbligazioni a basso rischio e legate all’inflazione con un orizzonte più breve pari a 1-3 anni."
+    else:
+        return None
+
+
+
 
 @app.route("/get")
 def get_bot_response():
@@ -208,6 +222,12 @@ def get_bot_response():
         return redirect(url_for('login'))
 
     userText = request.args.get('msg')
+
+    test= hardcode(userText)
+    if test !=None:
+        res={"rtype":"text","result":test}
+        return jsonify(res)
+
     response_content = chat(userText)
     return jsonify(response_content)
 
