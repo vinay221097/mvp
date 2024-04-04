@@ -474,7 +474,7 @@ height:100%;
 <div class="chat_window">
 
     <div class="top_menu">
-        <div class="title">Finance</div>
+        <div class="title">Klear Finance</div>
     </div>
     <ul class="messages">
     </ul>
@@ -516,104 +516,6 @@ height:100%;
 
 
 </div>
-
-
-
-<!-- 
-<script>
-(function () {
-    var Message;
-    Message = function (arg) {
-        this.text = arg.text, this.message_side = arg.message_side;
-        this.draw = function (_this) {
-            return function () {
-                var $message;
-                $message = $($('.message_template').clone().html());
-                $message.addClass(_this.message_side).find('.text').html(_this.text);
-                $('.messages').append($message);
-                return setTimeout(function () {
-                    return $message.addClass('appeared');
-                }, 0);
-            };
-        }(this);
-        return this;
-    };
-
-    $(function () {
-        var getMessageText, sendMessage, displayInitialGreeting;
-        
-        getMessageText = function () {
-            var $message_input;
-            $message_input = $('.message_input');
-            return $message_input.val();
-        };
-
-        sendMessage = function (text) {
-            var $messages, message;
-            if (text.trim() === '') {
-                return;
-            }
-            $('.message_input').val('');
-            $messages = $('.messages');
-
-            var message_side = 'right';
-            message = new Message({
-                text: text,
-                message_side: message_side
-            });
-            message.draw();
-
-            var loadingMessage = new Message({
-                text: '<span class="dot"></span><span class="dot"></span><span class="dot"></span>',
-                message_side: 'left'
-            });
-            loadingMessage.draw();
-
-            $.get("/get", { msg: text }).done(function(data) {
-                $('.messages .message:last-child').remove(); // Remove the loading indicator message
-                
-                var messageContent;
-                if (data.rtype === "image") {
-                    messageContent = '<img src="data:image/png;base64,' + data.result + '" style="max-width: 100%; display: block; margin: 0 auto;"/>';
-                } else {
-                    messageContent = data.result;
-                }
-                
-                var botMessage = new Message({
-                    text: messageContent,
-                    message_side: 'left'
-                });
-                botMessage.draw();
-                
-                $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
-            });
-
-            return $messages.animate({ scrollTop: $messages.prop('scrollHeight') }, 300);
-        };
-
-        displayInitialGreeting = function() {
-            var greetingMessage = new Message({
-                text: 'Sono Finn, come posso aiutarti oggi? Sono sempre pronto ad assistervi in modo rapido ed efficiente. Basta digitare!',
-                message_side: 'left'
-            });
-            greetingMessage.draw();
-        };
-
-        $('.send_message').click(function (e) {
-            return sendMessage(getMessageText());
-        });
-        $('.message_input').keyup(function (e) {
-            if (e.which === 13) {
-                return sendMessage(getMessageText());
-            }
-        });
-
-        // Display the initial greeting message from the bot when the page loads
-        displayInitialGreeting();
-    });
-}.call(this));
-</script>
- -->
 
 
 <script>
