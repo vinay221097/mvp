@@ -71,7 +71,7 @@ def extract_json_from_string(text):
     if len(matches) > 0:
         temp = matches[0]
         if type(temp) == str:
-            output = json.loads(temp)
+            output = json.loads(temp,strict=False)
         elif type(temp) == dict:
             output = temp
     return output
@@ -148,3 +148,4 @@ def get_stock_call(input_string:str):
         return f"output={specific_call}"
     else:
         return input_string
+
