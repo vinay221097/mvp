@@ -236,7 +236,7 @@ def format_output(text: str):
         # print(full_json_str)
         if full_json_str.endswith("```"):
             full_json_str = full_json_str[:-3]
-        return json.loads(full_json_str)
+        return json.loads(full_json_str, strict=False)
     except Exception as e:
         print("json error", e)
         if "{" in text and "}" in text:
