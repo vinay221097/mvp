@@ -110,14 +110,14 @@ To use these tools you must always respond in JSON format containing `"toolname"
 ```json
 {
     "toolname": "Stocker",
-    "input": "output=get_stock_data(ticker='CCL', start_date=DT.date.today()+DT.timedelta(days=-7),end_date=None)"
+    "input": "output=getstockdata(ticker='CCL', startdate=DT.date.today()+DT.timedelta(days=-7),enddate=None)"
 }
 ```
 or to answer a question like "What is the stock price of symbol CCL from jan 2023 to may 2023?" you must use the Stocker tool like so:
 ```json
 {
     "toolname": "Stocker",
-    "input": "output=get_stock_data(ticker='CCL', start_date='2023-01-01',end_date='2023-05-31')"
+    "input": "output=getstockdata(ticker='CCL', startdate='2023-01-01',enddate='2023-05-31')"
 }
 ```
 

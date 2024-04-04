@@ -81,7 +81,7 @@ def parse_date(date_str):
     """Parse any date string into a datetime object."""
     return dateparser.parse(str(date_str))
 
-def get_stock_data(ticker, start_date, end_date=None):
+def getstockdata(ticker, startdate, enddate=None):
     """
     Fetch and display stock data for a given ticker and date range.
     
@@ -91,9 +91,9 @@ def get_stock_data(ticker, start_date, end_date=None):
     - end_date: End date in various formats. If None, current date is used.
     """
     # Parse the start and end dates
-    start = parse_date(start_date)
+    start = parse_date(startdate)
     if end_date:
-        end = parse_date(end_date)
+        end = parse_date(enddate)
     else:
         end = pd.Timestamp.today()  # Use current date if end date is not provided
     
@@ -122,7 +122,7 @@ def get_stock_data(ticker, start_date, end_date=None):
 
 def get_stock_call(input_string:str):
     # Find the start index of 'get_stock_data'
-    start_index = input_string.find('get_stock_data')
+    start_index = input_string.find('getstockdata')
 
     # Ensure 'get_stock_data' is in the string
     if start_index != -1:
