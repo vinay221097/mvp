@@ -353,7 +353,7 @@ def plotter():
     category_diff = category_pivot.diff(axis=1)
     res=generate_plot(category_diff)
     rjson= {"rtype":"image","result":res}
-    return jsonify(str(rjson))
+    return rjson
 
 
 
