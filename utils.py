@@ -92,7 +92,7 @@ def getstockdata(ticker, startdate, enddate=None):
     """
     # Parse the start and end dates
     start = parse_date(startdate)
-    if end_date:
+    if enddate:
         end = parse_date(enddate)
     else:
         end = pd.Timestamp.today()  # Use current date if end date is not provided
