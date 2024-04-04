@@ -211,7 +211,7 @@ def hardcode(message):
     elif "risparmi" in message:
         return "Analizzando il tuo profilo di rischio e i tuoi obiettivi, ed ipotizzando un risparmio per l’anno futuro in linea con quello passato e pari a 5mila euro, allora ti suggerirei di investire in un piano di accumulo con un orizzonte temporale di 5-7 anni, in modo da sfruttare il cost average, investendo inizialmente una cifra di 2000€ e versando mensilmente circa 200 euro. La restante parte del risparmio in obbligazioni a basso rischio e legate all’inflazione con un orizzonte più breve pari a 1-3 anni."
     elif "spese" in message:
-        return plotter()
+        return "spese"
     else:
         return None
 
@@ -226,9 +226,11 @@ def get_bot_response():
     userText = request.args.get('msg')
 
     test= hardcode(userText)
-    if test !=None:
+    if test !=None and test!="spese":
         res={"rtype":"text","result":test}
         return jsonify(res)
+    elif test !=None and test=="spese":
+        return jsonify(plotter())
 
     response_content = chat(userText)
     return jsonify(response_content)
