@@ -105,7 +105,7 @@ def getstockdata(ticker, startdate, enddate=None):
     plt.figure(figsize=(10, 6))
     stock_data['Close'].plot(title=f'{ticker} Stock Closing Prices')
     plt.xlabel('Date')
-    plt.ylabel('Close Price (USD)')
+    plt.ylabel('Close Price ')
     # plt.show()
     plt.savefig(buf, format='png')
     
