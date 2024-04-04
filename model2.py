@@ -210,7 +210,7 @@ import json
 
 def format_output(text: str):
     try:
-        print(text)
+        # print(text)
         if "{" in text and "}" in text:
             resp=extract_json_from_string(text)
             if len(resp)>0:
