@@ -4,15 +4,14 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 import re,json
-from crawlbase import CrawlingAPI, ScraperAPI, LeadsAPI, ScreenshotsAPI, StorageAPI
-from crawlbase import CrawlingAPI
+from serpapi import GoogleSearch
 import json
 from flask import session
 import datetime as DT;
 
 
 def generate_text(prompt_input,system_prompt):
-    print("prompt",prompt_input)
+    # print("prompt",prompt_input)
     output = replicate.run(
     "mistralai/mixtral-8x7b-instruct-v0.1",
     input={
@@ -52,36 +51,64 @@ def get_math_answer(prompt_input):
     return output
 
 
+def get_backup_answer(prompt_input):
+    output = replicate.run(
+    "mistralai/mixtral-8x7b-instruct-v0.1",
+    input={
+        "top_k": 50,
+        "top_p": 0.9,
+        "prompt": """<s>[INST] You are a assistant with all knowledge and your job is to understand the question and answer to the best of your knowledge in a formal way. If you do not know the answer just say the reason and ask them to retry or even suggest a question similar one but which you know the answer. [/INST]"""+f"""<s>[INST] {prompt_input} [/INST] """,
+        "temperature": 0.9,
+        "max_new_tokens": 1024,
+
+        "presence_penalty": 0,
+        "frequency_penalty": 0
+    }
+)
+    output ="".join(output)
+    # print(output)
+
+    return output
+
+
 
 
 def search_answer(question):
-    api = CrawlingAPI({ 'token': 'rkcSMegJId6B-Wx6R9WNCw' })
-    google_search_url = 'https://www.google.com/search?q='+question
-    # options for Crawling API
-    options = {
-    'scraper': 'google-serp'
+    params = {
+      "api_key": "cff2d3fe0b668f8cf2692b027044308708399975dda29a049de5ff0d5a56c205",
+      "engine": "google",
+      "q": question,
+      "google_domain": "google.com",
+      "gl": "us",
+      "hl": "en"
     }
+
+
     res=""
     try:
-        response = api.get(google_search_url, options)
-        if response['status_code'] == 200 and response['headers']['pc_status'] == '200':
-            response_json = json.loads(response['body'].decode('latin1'))
-            response_json=response_json["body"]["searchResults"]
+        search = GoogleSearch(params)
+        response = search.get_dict()
+        # print(response)
+        if "description" in response.keys():
+            full_results=response["description"]
+        elif "organic_results" in response.keys():
+            response_json = response
+            response_json=response_json["organic_results"]
             # print(response_json)
             full_results=""
             for i in range (min(len(response_json),4)):
                 # print(response_json[i])
-                full_results+=response_json[i]["description"] 
-
+                full_results+=response_json[i]["snippet"] 
             system_prompt="You are a brilliant assistant and help in answering questions for the user."
             prompt_input=f"""Data:{full_results}
                             Based on the given data above can you answer {question}"""
 
             res= generate_text(prompt_input,system_prompt)
-    except Exception as e:
-        print("Exception",e)
-        res="Sorry answer not found due to some internal error"
+    except Exception as r:
+        print(r)
+        res=get_backup_answer(question)
     return res
+
 
 
 
