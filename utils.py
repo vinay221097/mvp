@@ -51,12 +51,8 @@ def interest_compound(capital=None,rate=None,period=None,debit=None) :
         n=period
         c=capital
         r=rate
-        d=debit
         eq=0
-        if debit==0:
-          eq=c*(1+r*(n-d)/100) -c
-        else:
-          eq=d*c/(n)*(1+r*(n-d)/100) -c
+        eq=(c * (1 + r/100) ** n) -c
     except Exception as e:
         print(e)
     return eq

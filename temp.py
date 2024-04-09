@@ -1,43 +1,40 @@
 from serpapi import GoogleSearch
 import json
-
-def search_answer(question):
-    params = {
-      "api_key": "cff2d3fe0b668f8cf2692b027044308708399975dda29a049de5ff0d5a56c205",
-      "engine": "google",
-      "q": question,
-      "google_domain": "google.com",
-      "gl": "us",
-      "hl": "en"
-    }
-
-
-    res=""
+import re
+from sympy import symbols, sympify
+from math import *
+from sympy import Symbol,Eq,solve
+import re
+def find_solutions_1(expression):
     try:
-        search = GoogleSearch(params)
-        response = search.get_dict()
-        # print(response)
-        if "description" in response.keys():
-            full_results=response["description"]
-        elif "organic_results" in response.keys():
-            response_json = response
-            response_json=response_json["organic_results"]
-            # print(response_json)
-            full_results=""
-            for i in range (min(len(response_json),4)):
-                # print(response_json[i])
-                full_results+=response_json[i]["snippet"] 
-            system_prompt="You are a brilliant assistant and help in answering questions for the user."
-            prompt_input=f"""Data:{full_results}
-                            Based on the given data above can you answer {question}"""
+        # Sostituisci "^" con "**" per gestire la notazione esponenziale
+        expression = re.sub(r'(?<=[0-9a-zA-Z])\^', '**', expression)
 
-            res= generate_text(prompt_input,system_prompt)
-    except Exception as r:
-        print(r)
-        res=get_backup_answer(question)
-    return res
+        # Sostituisci la notazione del coefficiente
+        expression = re.sub(r'([0-9a-zA-Z])x', r'\1*x', expression)
+
+        # Divide l'espressione in due parti: lato sinistro e lato destro dell'uguale "="
+        sides = expression.split("=")
+        left_side = sides[0]
+        right_side = sides[1] if len(sides) > 1 else '0'
+        
+        # Definisci il simbolo e analizza le due parti dell'equazione
+        x = Symbol('x')
+        left_expression = sympify(left_side)
+        right_expression = sympify(right_side)
+
+        # Definisci l'equazione come uguaglianza tra le due parti
+        equation = left_expression - right_expression
+
+        solutions = solve(equation, x)
+        numeric_solutions = [solution.evalf() for solution in solutions]
+        print(numeric_solutions)
+        return numeric_solutions
+    except Exception as e:
+        print("Si è verificato un errore:", e)
+        return None
 
 
-question="latest news on microsoft"
+question="valuta x^2-2x+1=0"
 
-print(search_answer(question))
+print(find_solutions_1(question))

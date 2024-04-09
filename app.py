@@ -201,8 +201,47 @@ name = 'Finn'
 role = 'Assistant'
 
 
+
+
+def find_solutions_1(expression):
+    try:
+        expression= expression.replace("valuta","").strip()
+        print("expression",expression)
+        # Sostituisci "^" con "**" per gestire la notazione esponenziale
+        expression = re.sub(r'(?<=[0-9a-zA-Z])\^', '**', expression)
+
+        # Sostituisci la notazione del coefficiente
+        expression = re.sub(r'([0-9a-zA-Z])x', r'\1*x', expression)
+
+        # Divide l'espressione in due parti: lato sinistro e lato destro dell'uguale "="
+        sides = expression.split("=")
+        left_side = sides[0]
+        right_side = sides[1] if len(sides) > 1 else '0'
+        
+        # Definisci il simbolo e analizza le due parti dell'equazione
+        x = Symbol('x')
+        left_expression = sympify(left_side)
+        right_expression = sympify(right_side)
+
+        # Definisci l'equazione come uguaglianza tra le due parti
+        equation = left_expression - right_expression
+
+        solutions = solve(equation, x)
+        numeric_solutions = [solution.evalf() for solution in solutions]
+        final_x=""
+        for numeric in numeric_solutions:
+            # print(numeric)
+            final_x+=f" x={round(float(numeric),3)}"
+        # print(final_x)
+        return final_x
+    except Exception as e:
+        print("Si è verificato un errore:", e)
+        return None
+
+
+
 def hardcode(message):
-    if "it0005518128" in message:
+    if "it0005518128" in message or "IT0005518128" in message:
         return """Riusciresti a dirmi qual è il tuo prezzo medio di carico? In caso negativo. il titolo nella giornata di ieri, 28 marzo 2024, ha chiuso ad un prezzo di 106,05€, questo significa che se l’avessi comprato al prezzo minimo del 5 ottobre 2023, pari a 96,85€ il capital gain alla chiusura di ieri sarebbe del 9,912%, mentre se fosse al prezzo massimo pari a 97,45€ massimo il capital gain sarebbe del 9,236%. 
                 Inoltre, per calcolare il tuo guadagno è necessario tenere in considerazione anche il rateo maturato dalla data di acquisto, pari a 180 giorni al tasso di interesse dell’obbligazione pari a 4,40%.
                 Per calcolare con esattezza il tuo guadagno riusciresti a dirmi il prezzo medio di carico che quantità hai acquisito? """
@@ -212,6 +251,8 @@ def hardcode(message):
         return "Analizzando il tuo profilo di rischio e i tuoi obiettivi, ed ipotizzando un risparmio per l’anno futuro in linea con quello passato e pari a 5mila euro, allora ti suggerirei di investire in un piano di accumulo con un orizzonte temporale di 5-7 anni, in modo da sfruttare il cost average, investendo inizialmente una cifra di 2000€ e versando mensilmente circa 200 euro. La restante parte del risparmio in obbligazioni a basso rischio e legate all’inflazione con un orizzonte più breve pari a 1-3 anni."
     elif "spese" in message:
         return "spese"
+    elif "valuta" in message:
+        return find_solutions_1(message)
     else:
         return None
 
